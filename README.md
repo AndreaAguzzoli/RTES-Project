@@ -1,5 +1,5 @@
 # RTES-Project
-Questo repository contiene il progetto di Aguzzoli e Mercoliano
+Questo repository contiene il progetto di Aguzzoli e Mercoliano.
 
 # libreria che gestisca oggetti GENERICI
 
@@ -16,6 +16,6 @@ Questo repository contiene il progetto di Aguzzoli e Mercoliano
 - con un override del costruttore vengono generate code multiple a priorità statica (una per ogni grado di priorità) ognuna gestita in modo FIFO
 - il parametro da inserire sono il numero di gradi di priorità (quindi il numero di code)
 - se un valore alto implica un grado di priorità alto o viceversa viene indicato nelle **specifiche della API**
-- **ANZIANITA'** cambio priorità sulla base del tempo di stazionamento nella coda (timer che allo scadere causa il cambio di priorità)
+- ?? **ANZIANITA'** cambio priorità sulla base del tempo di stazionamento nella coda (timer che allo scadere causa il cambio di priorità)
 
-- **OPZIONALE** --> unico buffer circolare composto da tanti buffer circolari per semplificare il cambio del valore di priorità
+- ?? **OPZIONALE** --> unico buffer circolare composto da tanti buffer circolari per semplificare il cambio del valore di priorità
