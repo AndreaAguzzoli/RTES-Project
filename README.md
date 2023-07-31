@@ -6,7 +6,7 @@ Questo repository contiene il progetto di Aguzzoli e Mercoliano.
 # CODA FIFO	
 
 - costruttore di default che genera una coda FIFO con dimensione limitata ad un certo valore di default 
-- override del costruttore con un parametro in più che indica la dimensione della coda da creare
+- overload del costruttore con un parametro in più che indica la dimensione della coda da creare
 - Possibilità di shift quando arriva un nuovo elemento e il buffer è pieno oppure shift quando specificato con l'aggiunta di un parametro
 - gestione coda nel FIFO
 - funzioni PUSH POP E PULL con mutua esclusione
