@@ -58,7 +58,7 @@ void Generic_Queue<smt>::insertSpecificItem(smt item, int index){
 
 int main(){
     cout << "started..." << endl;
-    Generic_Queue<int> q(0);
+    Generic_Queue<int> q(q.FIFO);
     q.insertSpecificItem((int) 10, 0);
     cout << "Valore: " << q.getSpecificItem(0) << endl;
 }
