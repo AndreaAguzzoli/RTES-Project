@@ -19,9 +19,9 @@ using namespace std;
 template<class T>
 class Queue{
     public:
-        Queue(int = FIFO); //Costruttore(type) con valore di default FIFO (ovvero 0)
-        Queue(int = FIFO, size_t = DIM); //Costruttore(type, dim) con valori di default FIFO (ovvero 0) e DIM
-        Queue(int = FIFO, int = 1); //Costruttore(type, levels) con valori di default FIFO (ovvero 0) e 1
+        //Queue(int = FIFO); //Costruttore(type) con valore di default FIFO (ovvero 0)
+        //Queue(int = FIFO, size_t = DIM); //Costruttore(type, dim) con valori di default FIFO (ovvero 0) e DIM
+        //Queue(int = FIFO, int = 1); //Costruttore(type, levels) con valori di default FIFO (ovvero 0) e 1
         Queue(int = FIFO, int = 1, size_t = DIM); //Costruttore(type, levels, dim) con valori di default FIFO (ovvero 0), 1 e DIM
 
         void setType(int); //Setter del parametro type per cambiare tipo di coda (funziona solamente se la coda è vuota)
@@ -32,8 +32,8 @@ class Queue{
 
     private:
         int type;
-        int levels=1;
-        smt **queue;
-        int dim=DIM;
-}
+        int levels;
+        T **queue;
+        int dim;
+};
 #endif
