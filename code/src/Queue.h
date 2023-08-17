@@ -19,18 +19,34 @@ using namespace std;
 template<class T>
 class Queue{
     public:
-        //Queue(int = FIFO); //Costruttore(type) con valore di default FIFO (ovvero 0)
-        //Queue(int = FIFO, size_t = DIM); //Costruttore(type, dim) con valori di default FIFO (ovvero 0) e DIM
-        //Queue(int = FIFO, int = 1); //Costruttore(type, levels) con valori di default FIFO (ovvero 0) e 1
-        Queue(int = FIFO, int = 1, size_t = DIM); //Costruttore(type, levels, dim) con valori di default FIFO (ovvero 0), 1 e DIM
+    /**
+     * I costruttori senza parametri o i cui parametri hanno tutti un valore di default specificato sono detti "DEFAULT o ZERO CONSTRUCTOR".
+     * Nel nostro caso il costruttore di default è Queue(int, int, size_t) in cui viene associato il valore di default ad i parametri non specificati.
+     * È fortemente dipendente dalla posizione nel senso che:
+     * Queue<int> q; --> Queue(FIFO, 1, DIM);
+     * Queue<int> q(1) --> Queue(1, 1, DIM);
+     * Queue<int> q(1, 5) --> Queue(1, 5, DIM);
+     * Queue<int> q(1, 5, 80) --> Queue(1, 5, 80);
+     * Non può essere specificato il parametro dim senza aver prima definito i due parametri che lo precedono.
+     * 
+     * Spiegato ciò vieniamo al perché ho aggiunto il secondo costruttore. Se si vuole una coda di multipli livelli è intuititvo che il parametro levels vada
+     * specificato. L'unico caso in cui si può desiderare specificare il parametro dim senza gli altri due è quando si vuole una coda FIFO con una certa
+     * dimensione non di default. Quindi il secondo costruttore copre proprio questo caso: genera una coda FIFO della dimensione specificata come parametro.
+     * Attenzione a castare l'input!
+     * Queue<int> q(10); --> NO, viene chiamato il costruttore di default perché 10 viene considerato int.
+     * Queue<int> q((size_t)10) --> SI
+     * **/
+        Queue(int type = FIFO, int levels = 1, size_t dim = DIM);
+        Queue(size_t dim);
 
-        void setType(int); //Setter del parametro type per cambiare tipo di coda (funziona solamente se la coda è vuota)
-        void setLevels(int); //Setter del parametro levels per cambiare il numero di livelli di priorità (funziona solamente se la coda è vuota e se il nuovo numero di livelli è minore del precedente, viene eliminata la coda con la priorità più bassa)
+        void setLevels(int);
+        void setType(int);
 
-        int getType(); //Ritorna il tipo di coda.
         int getLevels(); //Ritorna il numero di livelli della coda (che coincide con la priorità massima)
+        int getType(); //Ritorna il tipo di coda.
 
     private:
+        bool empty=true, full=false;
         int type;
         int levels;
         T **queue;
