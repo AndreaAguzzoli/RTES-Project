@@ -49,9 +49,9 @@ class Queue{
 
         int getType(); //Ritorna il tipo di coda.
 
-        void pop(int priority = 0); // estrae l'elemento in testa alla coda (default) o alla coda relativa ad un certo livello di priorità (code multiple)
+        void pop(int priority = -1); // estrae l'elemento in testa alla coda FIFO (default) o alla coda relativa ad un certo livello di priorità (code multiple)
 
-        void push(T element, int priority = 0); // inserisce in fondo alla coda l'elemento indicato (default) o in fondo alla coda relativa ad un certo livello di priorità (code multiple)
+        void push(T element, int priority = -1); // inserisce in fondo alla coda FIFO l'elemento indicato (default) o in fondo alla coda relativa ad un certo livello di priorità (code multiple)
 
     private:
         bool empty=true, full=false;
@@ -59,5 +59,13 @@ class Queue{
         int levels;
         T **queue;
         int dim;
+
+        /*
+        I seguenti 3 interi servono per la gestione dell'array circolare che compone la coda. "head" indica il primo elemento inserito, mentre "tail" indica l'ultimo inserito. Significa che nel momento in cui non ci sono elementi o nel momento in cui ce n'è 1 solo hanno lo stesso valore. Mentre nel momento in cui tail è il precedente di head significa che l'array è pieno. Per distinguere se l'array è pieno o vuoto abbiamo quindi bisogno della variabile "numElementi".
+        Quando viene estratto un elemento il valore di "head" si incrementa di una unità, mentre nel momento il cui viene inserito un elemento si incrementa il valore di "tail".
+        */
+        int* head; //indica il primo elemento occupato
+        int* tail; //indica l'ultimo elemento occupato
+        int numElementi; //indica il numero di elementi presenti nell'array per capire se è pieno o vuoto
 };
 #endif

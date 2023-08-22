@@ -56,6 +56,15 @@ Queue<T>::Queue(size_t dim){
     this->levels = 1;
     this->dim = dim;
 
+    // dichiarazione primoVuoto e primoPieno (array con un solo slot)
+    head = (int*)malloc(1*sizeof(int));
+    tail = (int*)malloc(1*sizeof(int));
+    numElementi = (int*)malloc(1*sizeof(int));
+    head[0] = 0;
+    tail[0] = 0;
+    numElementi[0] = 0;
+
+
     this->queue = (T**)malloc(this->dim*sizeof(T*));
     for(int i=0; i<this->dim; ++i)
         this->queue[i] = (T*)malloc(sizeof(T));
@@ -86,19 +95,15 @@ void Queue<T>::setLevels(int newlevels){
 
 template<class T>
 void Queue<T>::pop (int priority) {
-    if (priority == 0) {
+    T result;
+    if (type == FIFO) {
         // in questo caso la coda è di tipo FIFO
         //pthread_mutex_lock(&mutex);
         try {
-            if (empty == false) {
-                for (int i=0; i<this->dim-1; i++) {
-                    queue[i] = queue [i+1];
-                }
-                queue[dim-1] = NULL;
-                //dopo aver eliminato un elemento guardo se ora la coda è vuota, in tal caso setto empty = true.
-                if (queue.empty() == true) {
-                    empty == true;
-                }
+            if (numElementi != 0) {     // se la coda non è vuota allora ...
+                result = queue[head[0]];
+                head[0]++;
+                numElementi[0]--;
             }
             else {
                 throw -1;
@@ -115,17 +120,11 @@ void Queue<T>::pop (int priority) {
             //scorro i livelli di priorità finchè non trovo quello specificato come parametro
             if (priority == i) { 
                 //pthread_mutex_lock(&mutex);
-                bool isEmpty = queue[i].empty(); // isEmpty = true --> vuoto ; isEmpty = false --> non vuoto
                 try {
-                    if (isEmpty == false) {
-                        for (int j=0; j<this->dim-1; j++) {
-                            queue[i][j] = queue [i][j+1];
-                        }
-                        queue[i][dim-1] = NULL;
-                        //dopo aver eliminato un elemento guardo se ora la coda è vuota, in tal caso setto empty = true.
-                        if (queue[i].empty() == true) {
-                            empty == true;
-                        }
+                    if (numElementi[i] != 0) {  // se la coda indicata non è vuota allora ...
+                        result = queue[head[i]];
+                        head[i] = (head[i] - 1) % dim;
+                        numElementi[i]--; 
                     }
                     else {
                         throw -1;
@@ -143,22 +142,14 @@ void Queue<T>::pop (int priority) {
 
 template<class T>
 void Queue<T>::push (T element, int priority) {
-    if (priority == 0) {
+    if (type == FIFO) {
         // in questo caso la coda è di tipo FIFO
         //pthread_mutex_lock(&mutex);
         try {            
-            if (full == false) {
-                // inserisci elemento quando trovo una posizione libera
-                for (int i=0; i<this->dim; i++){                    
-                    if (queue[i] == NULL) {
-                        // trovata una posizione vuota, posso inserire qui il nuovo elemento
-                        queue[i] = element;
-                        if (empty == true) { // se la coda era vuota ora segno che non lo è più
-                            empty = false;
-                        }
-                        break;
-                    }                    
-                }
+            if ( ((tail[0] + 1) % dim) != head[0] ) { // se l'array non è pieno allora ...
+                ++tail[0];
+                queue[tail[0]];
+                numElementi[i]++;
             }
             else {
                 throw -1;
@@ -175,22 +166,11 @@ void Queue<T>::push (T element, int priority) {
             //scorro i livelli di priorità finchè non trovo quello specificato come parametro
             if (priority == i) { 
                 //pthread_mutex_lock(&mutex);
-                bool isFull = true;
-                for (int j=0; j<this->dim; j++) {
-                    if (queue[i][j] == NULL) {
-                        isFull = false;
-                        break;
-                    }
-                }
                 try {
-                    if (isFull == false) {
-                        for (int j=0; j<this->dim; j++) {
-                            if (queue[i][j] == NULL) {
-                                // trovata una posizione vuota, posso inserire qui il nuovo elemento
-                                queue[i][j] = element;
-                                break;
-                            }
-                        }
+                    if ( ((tail[i] + 1) % dim) != head[i] ) { // se l'array non è pieno allora ...
+                        ++tail[i];
+                        queue[tail[i]];
+                        numElementi[i]++;
                     }
                     else {
                         throw -1;
