@@ -36,14 +36,22 @@ class Queue{
      * Queue<int> q(10); --> NO, viene chiamato il costruttore di default perché 10 viene considerato int.
      * Queue<int> q((size_t)10) --> SI
      * **/
+
         Queue(int type = FIFO, int levels = 1, size_t dim = DIM);
+
         Queue(size_t dim);
 
         void setLevels(int);
+
         void setType(int);
 
         int getLevels(); //Ritorna il numero di livelli della coda (che coincide con la priorità massima)
+
         int getType(); //Ritorna il tipo di coda.
+
+        void pop(int priority = 0); // estrae l'elemento in testa alla coda (default) o alla coda relativa ad un certo livello di priorità (code multiple)
+
+        void push(T element, int priority = 0); // inserisce in fondo alla coda l'elemento indicato (default) o in fondo alla coda relativa ad un certo livello di priorità (code multiple)
 
     private:
         bool empty=true, full=false;

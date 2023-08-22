@@ -84,6 +84,128 @@ void Queue<T>::setLevels(int newlevels){
     this->levels = newlevels;
 }
 
+template<class T>
+void Queue<T>::pop (int priority) {
+    if (priority == 0) {
+        // in questo caso la coda è di tipo FIFO
+        //pthread_mutex_lock(&mutex);
+        try {
+            if (empty == false) {
+                for (int i=0; i<this->dim-1; i++) {
+                    queue[i] = queue [i+1];
+                }
+                queue[dim-1] = NULL;
+                //dopo aver eliminato un elemento guardo se ora la coda è vuota, in tal caso setto empty = true.
+                if (queue.empty() == true) {
+                    empty == true;
+                }
+            }
+            else {
+                throw -1;
+            }
+        }
+        catch (...) {
+            cout << "ERRORE: La coda è vuota e non è possibile eseguire la POP.\n";
+        }
+        //pthread_mutex_unlock(&mutex);
+    }
+    else {
+        // in questo caso la funzione deve lavorare sulla coda relativa ad un certo livello di priorità
+        for (int i=0; i<this->levels; i++) {
+            //scorro i livelli di priorità finchè non trovo quello specificato come parametro
+            if (priority == i) { 
+                //pthread_mutex_lock(&mutex);
+                bool isEmpty = queue[i].empty(); // isEmpty = true --> vuoto ; isEmpty = false --> non vuoto
+                try {
+                    if (isEmpty == false) {
+                        for (int j=0; j<this->dim-1; j++) {
+                            queue[i][j] = queue [i][j+1];
+                        }
+                        queue[i][dim-1] = NULL;
+                        //dopo aver eliminato un elemento guardo se ora la coda è vuota, in tal caso setto empty = true.
+                        if (queue[i].empty() == true) {
+                            empty == true;
+                        }
+                    }
+                    else {
+                        throw -1;
+                    }
+                }
+                catch (...) {
+                    cout << "ERRORE: La coda di priorità indicata è vuota, quindi non è possibile eseguire la POP.\n";
+                }
+                //pthread_mutex_unlock(&mutex);
+                break;
+            }
+        }
+    }
+}
+
+template<class T>
+void Queue<T>::push (T element, int priority) {
+    if (priority == 0) {
+        // in questo caso la coda è di tipo FIFO
+        //pthread_mutex_lock(&mutex);
+        try {            
+            if (full == false) {
+                // inserisci elemento quando trovo una posizione libera
+                for (int i=0; i<this->dim; i++){                    
+                    if (queue[i] == NULL) {
+                        // trovata una posizione vuota, posso inserire qui il nuovo elemento
+                        queue[i] = element;
+                        if (empty == true) { // se la coda era vuota ora segno che non lo è più
+                            empty = false;
+                        }
+                        break;
+                    }                    
+                }
+            }
+            else {
+                throw -1;
+            }
+        }
+        catch (...) {
+            cout << "ERRORE: La coda è piena, quindi non è possibile eseguire la PUSH.\n";
+        }
+        //pthread_mutex_unlock(&mutex);
+    }
+    else {
+        // in questo caso la funzione deve lavorare sulla coda relativa ad un certo livello di priorità
+        for (int i=0; i<this->levels; i++) {
+            //scorro i livelli di priorità finchè non trovo quello specificato come parametro
+            if (priority == i) { 
+                //pthread_mutex_lock(&mutex);
+                bool isFull = true;
+                for (int j=0; j<this->dim; j++) {
+                    if (queue[i][j] == NULL) {
+                        isFull = false;
+                        break;
+                    }
+                }
+                try {
+                    if (isFull == false) {
+                        for (int j=0; j<this->dim; j++) {
+                            if (queue[i][j] == NULL) {
+                                // trovata una posizione vuota, posso inserire qui il nuovo elemento
+                                queue[i][j] = element;
+                                break;
+                            }
+                        }
+                    }
+                    else {
+                        throw -1;
+                    }
+                }                
+                catch (...) {
+                    cout << "ERRORE: La coda di priorità indicata è piena, quindi non è possibile eseguire la PUSH.\n";
+                }
+                //pthread_mutex_unlock(&mutex);
+                break;
+            }
+        }
+    }
+}
+
 int main(void){
     Queue<int>  q, q2((size_t)150), q3(FIXED_PRIORITY, 12);
     q3.setLevels(10);
