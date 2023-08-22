@@ -66,6 +66,6 @@ class Queue{
         */
         int* head; //indica il primo elemento occupato
         int* tail; //indica l'ultimo elemento occupato
-        int numElementi; //indica il numero di elementi presenti nell'array per capire se è pieno o vuoto
+        int* numElementi; //indica il numero di elementi presenti nell'array per capire se è pieno o vuoto
 };
 #endif
