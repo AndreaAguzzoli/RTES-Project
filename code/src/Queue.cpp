@@ -49,7 +49,7 @@ Queue<T>::Queue(int type, int levels, size_t dim){
         this->queue[i][0] = 0;
         
         this->head[i] = 0;
-        this->tail[i] = 0;
+        this->tail[i] = -1;
         this->numElementi[i] = 0;
         
     }
@@ -71,7 +71,7 @@ Queue<T>::Queue(size_t dim){
     this->tail = (int*)malloc(1*sizeof(int));
     this->numElementi = (int*)malloc(1*sizeof(int));
     this->head[0] = 0;
-    this->tail[0] = 0;
+    this->tail[0] = -1;
     this->numElementi[0] = 0;
 
 
@@ -112,7 +112,7 @@ void Queue<T>::pop (int priority) {
         try {
             if (numElementi != 0) {     // se la coda non è vuota allora ...
                 result = queue[head[0]];
-                head[0]++;
+                head[0] = (head[0] + 1) % dim;
                 numElementi[0]--;
             }
             else {
@@ -133,7 +133,7 @@ void Queue<T>::pop (int priority) {
                 try {
                     if (numElementi[i] != 0) {  // se la coda indicata non è vuota allora ...
                         result = queue[head[i]];
-                        head[i] = (head[i] - 1) % dim;
+                        head[i] = (head[i] + 1) % dim;
                         numElementi[i]--; 
                     }
                     else {
@@ -157,8 +157,8 @@ void Queue<T>::push (T element, int priority) {
         //pthread_mutex_lock(&mutex);
         try {            
             if ( ((tail[0] + 1) % dim) != head[0] ) { // se l'array non è pieno allora ...
-                ++tail[0];
-                queue[tail[0]];
+                tail[0] = (tail[0] + 1) % dim;
+                queue[tail[0]] = element;
                 numElementi[0]++;
             }
             else {
@@ -178,8 +178,8 @@ void Queue<T>::push (T element, int priority) {
                 //pthread_mutex_lock(&mutex);
                 try {
                     if ( ((tail[i] + 1) % dim) != head[i] ) { // se l'array non è pieno allora ...
-                        ++tail[i];
-                        queue[tail[i]];
+                        tail[i] = (tail[i] + 1) % dim;
+                        queue[tail[i]] = element;
                         numElementi[i]++;
                     }
                     else {
