@@ -159,7 +159,7 @@ void Queue<T>::push (T element, int priority) {
             if ( ((tail[0] + 1) % dim) != head[0] ) { // se l'array non è pieno allora ...
                 ++tail[0];
                 queue[tail[0]];
-                numElementi[i]++;
+                numElementi[0]++;
             }
             else {
                 throw -1;
