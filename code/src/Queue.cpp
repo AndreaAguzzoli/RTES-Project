@@ -35,6 +35,11 @@ Queue<T>::Queue(int type, int levels, size_t dim){
         return;
     }
 
+    // dichiarazione primoVuoto e primoPieno (array con un solo slot)
+    this->head = (int*)malloc(this->levels*sizeof(int));
+    this->tail = (int*)malloc(this->levels*sizeof(int));
+    this->numElementi = (int*)malloc(this->levels*sizeof(int));
+
     this->queue = (T**)malloc(this->dim*sizeof(T*));
     for(int i=0; i<this->levels; ++i){
         if(type>FIFO)
@@ -42,6 +47,11 @@ Queue<T>::Queue(int type, int levels, size_t dim){
         else
             this->queue[i] = (T*)malloc(sizeof(T));
         this->queue[i][0] = 0;
+        
+        this->head[i] = 0;
+        this->tail[i] = 0;
+        this->numElementi[i] = 0;
+        
     }
 }
 
@@ -57,12 +67,12 @@ Queue<T>::Queue(size_t dim){
     this->dim = dim;
 
     // dichiarazione primoVuoto e primoPieno (array con un solo slot)
-    head = (int*)malloc(1*sizeof(int));
-    tail = (int*)malloc(1*sizeof(int));
-    numElementi = (int*)malloc(1*sizeof(int));
-    head[0] = 0;
-    tail[0] = 0;
-    numElementi[0] = 0;
+    this->head = (int*)malloc(1*sizeof(int));
+    this->tail = (int*)malloc(1*sizeof(int));
+    this->numElementi = (int*)malloc(1*sizeof(int));
+    this->head[0] = 0;
+    this->tail[0] = 0;
+    this->numElementi[0] = 0;
 
 
     this->queue = (T**)malloc(this->dim*sizeof(T*));
