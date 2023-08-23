@@ -77,7 +77,7 @@ void Queue<T>::push (T element, int priority) {
         startPush();
 
         sem_wait(&mutex);
-        if ( ((tail[0] + 1) % dim) != head[0] ) { // se l'array non è pieno allora ...
+        if ( numElementi[0] != dim ) { // se l'array non è pieno allora ...
             tail[0] = (tail[0] + 1) % dim;
             queue[tail[0]] = element;
             ++numElementi[0];
@@ -100,7 +100,7 @@ void Queue<T>::push (T element, int priority) {
                 startPush();
 
                 sem_wait(&mutex);
-                if ( ((tail[i] + 1) % dim) != head[i] ) { // se l'array non è pieno allora ...
+                if ( numElementi[i] != dim ) { // se l'array non è pieno allora ...
                     tail[i] = (tail[i] + 1) % dim;
                     queue[tail[i]] = element;
                     ++numElementi[i];

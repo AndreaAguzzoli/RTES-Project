@@ -103,6 +103,7 @@ void Queue<T>::setLevels(int newlevels){
     this->levels = newlevels;
 }
 
+/*la variabile result dovrebbe essere quella che ritorna il valore del dato estratto, se serve bisognerebbe trasformare la POP in una funzione che ritorna un intero*/
 template<class T>
 void Queue<T>::pop (int priority) {
     T result;
@@ -168,7 +169,7 @@ void Queue<T>::push (T element, int priority) {
         // in questo caso la coda è di tipo FIFO
         //pthread_mutex_lock(&mutex);
         try {            
-            if ( ((tail[0] + 1) % dim) != head[0] ) { // se l'array non è pieno allora ...
+            if ( numElementi[0] != dim ) { // se l'array non è pieno allora ...
                 tail[0] = (tail[0] + 1) % dim;
                 queue[tail[0]] = element;
                 ++numElementi[0];
@@ -195,7 +196,7 @@ void Queue<T>::push (T element, int priority) {
             if (priority == i) { 
                 //pthread_mutex_lock(&mutex);
                 try {
-                    if ( ((tail[i] + 1) % dim) != head[i] ) { // se l'array non è pieno allora ...
+                    if ( numElementi[i] != dim ) { // se l'array non è pieno allora ...
                         tail[i] = (tail[i] + 1) % dim;
                         queue[tail[i]] = element;
                         ++numElementi[i];
