@@ -19,3 +19,18 @@ Questo repository contiene il progetto di Aguzzoli e Mercoliano.
 - ?? **ANZIANITA'** cambio priorità sulla base del tempo di stazionamento nella coda (timer che allo scadere causa il cambio di priorità)
 
 - ?? **OPZIONALE** --> unico buffer circolare composto da tanti buffer circolari per semplificare il cambio del valore di priorità
+
+# QoS 
+
+## Best Effort
+
+"Attempt to deliver samples, but may lose them if the network is not robust".
+
+Nel caso in questione si cerca con una PUSH di inserire un elemento all'interno della coda, ma a seconda dello stato in cui si trova la coda, non è detto che l'elemento in questione sia correttamente inserito all'interno della coda.
+
+## Reliability
+
+"Guarantee that samples are delivered, may retry multiple times".
+
+Nel caso in questione quando con una PUSH si vuole inserire un elemento all'interno della coda, viene garantito il suo corretto inserimento all'interno di quest'ultima. Se nello stato attuale della coda questo non è possibile, riprova molteplici volte finchè non ci riesce.
+

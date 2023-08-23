@@ -115,9 +115,9 @@ void Queue<T>::pop (int priority) {
                 head[0] = (head[0] + 1) % dim;
                 --numElementi[0];
                 // controllo se aggiornare i valori delle variabili 'empty' e 'full'
-                if (numElementi == 0) 
+                if (numElementi[0] == 0) 
                     empty = true;
-                else if ((numElementi != dim) && (full == true)){
+                else if ((numElementi[0] != dim) && (full == true)){
                     full = false;
                 }
             }
@@ -142,9 +142,9 @@ void Queue<T>::pop (int priority) {
                         head[i] = (head[i] + 1) % dim;
                         --numElementi[i];
                         // controllo se aggiornare i valori delle variabili 'empty' e 'full'
-                        if (numElementi == 0) 
+                        if (numElementi[i] == 0) 
                             empty = true;
-                        else if ((numElementi != dim) && (full == true)){
+                        else if ((numElementi[i] != dim) && (full == true)){
                             full = false;
                         }
                     }
@@ -173,9 +173,9 @@ void Queue<T>::push (T element, int priority) {
                 queue[tail[0]] = element;
                 ++numElementi[0];
                 // controllo se aggiornare i valori delle variabili 'empty' e 'full'
-                if (numElementi == dim) 
+                if (numElementi[0] == dim) 
                     full = true;
-                else if ((numElementi != 0) && (empty == true)){
+                else if ((numElementi[0] != 0) && (empty == true)){
                     empty = false;
                 }
             }
@@ -200,9 +200,9 @@ void Queue<T>::push (T element, int priority) {
                         queue[tail[i]] = element;
                         ++numElementi[i];
                         // controllo se aggiornare i valori delle variabili 'empty' e 'full'
-                        if (numElementi == 0) 
+                        if (numElementi[i] == 0) 
                             full = true;
-                        else if ((numElementi != 0) && (empty == true)){
+                        else if ((numElementi[i] != 0) && (empty == true)){
                             empty = false;
                         }
                     }
