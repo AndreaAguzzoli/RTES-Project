@@ -113,7 +113,13 @@ void Queue<T>::pop (int priority) {
             if (numElementi != 0) {     // se la coda non è vuota allora ...
                 result = queue[head[0]];
                 head[0] = (head[0] + 1) % dim;
-                numElementi[0]--;
+                --numElementi[0];
+                // controllo se aggiornare i valori delle variabili 'empty' e 'full'
+                if (numElementi == 0) 
+                    empty = true;
+                else if ((numElementi != dim) && (full == true)){
+                    full = false;
+                }
             }
             else {
                 throw -1;
@@ -134,7 +140,13 @@ void Queue<T>::pop (int priority) {
                     if (numElementi[i] != 0) {  // se la coda indicata non è vuota allora ...
                         result = queue[head[i]];
                         head[i] = (head[i] + 1) % dim;
-                        numElementi[i]--; 
+                        --numElementi[i];
+                        // controllo se aggiornare i valori delle variabili 'empty' e 'full'
+                        if (numElementi == 0) 
+                            empty = true;
+                        else if ((numElementi != dim) && (full == true)){
+                            full = false;
+                        }
                     }
                     else {
                         throw -1;
@@ -159,7 +171,13 @@ void Queue<T>::push (T element, int priority) {
             if ( ((tail[0] + 1) % dim) != head[0] ) { // se l'array non è pieno allora ...
                 tail[0] = (tail[0] + 1) % dim;
                 queue[tail[0]] = element;
-                numElementi[0]++;
+                ++numElementi[0];
+                // controllo se aggiornare i valori delle variabili 'empty' e 'full'
+                if (numElementi == dim) 
+                    full = true;
+                else if ((numElementi != 0) && (empty == true)){
+                    empty = false;
+                }
             }
             else {
                 throw -1;
@@ -180,7 +198,13 @@ void Queue<T>::push (T element, int priority) {
                     if ( ((tail[i] + 1) % dim) != head[i] ) { // se l'array non è pieno allora ...
                         tail[i] = (tail[i] + 1) % dim;
                         queue[tail[i]] = element;
-                        numElementi[i]++;
+                        ++numElementi[i];
+                        // controllo se aggiornare i valori delle variabili 'empty' e 'full'
+                        if (numElementi == 0) 
+                            full = true;
+                        else if ((numElementi != 0) && (empty == true)){
+                            empty = false;
+                        }
                     }
                     else {
                         throw -1;
