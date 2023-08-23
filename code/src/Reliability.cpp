@@ -83,9 +83,9 @@ void Queue<T>::push (T element, int priority) {
             ++numElementi[0];
             // controllo se aggiornare i valori delle variabili 'empty' e 'full'
             if (numElementi[0] == dim) 
-                full = true;
-            else if ((numElementi[0] != 0) && (empty == true)){
-                empty = false;
+                full[0] = true;
+            else if ((numElementi[0] != 0) && (empty[0] == true)){
+                empty[0] = false;
             }
         }
         sem_post(&mutex);
@@ -106,9 +106,9 @@ void Queue<T>::push (T element, int priority) {
                     ++numElementi[i];
                     // controllo se aggiornare i valori delle variabili 'empty' e 'full'
                     if (numElementi[i] == 0) 
-                        full = true;
-                    else if ((numElementi[i] != 0) && (empty == true)){
-                        empty = false;
+                        full[i] = true;
+                    else if ((numElementi[i] != 0) && (empty[i] == true)){
+                        empty[i] = false;
                     }
                 }
                 sem_post(&mutex);
@@ -134,9 +134,9 @@ void Queue<T>::pop (int priority) {
             --numElementi[0];
             // controllo se aggiornare i valori delle variabili 'empty' e 'full'
             if (numElementi[0] == 0) 
-                empty = true;
-            else if ((numElementi[0] != dim) && (full == true)){
-                full = false;
+                empty[0] = true;
+            else if ((numElementi[0] != dim) && (full[0] == true)){
+                full[0] = false;
             }
         }
         sem_post(&mutex);
@@ -157,9 +157,9 @@ void Queue<T>::pop (int priority) {
                     --numElementi[i];
                     // controllo se aggiornare i valori delle variabili 'empty' e 'full'
                     if (numElementi[i] == 0) 
-                        empty = true;
-                    else if ((numElementi[i] != dim) && (full == true)){
-                        full = false;
+                        empty[i] = true;
+                    else if ((numElementi[i] != dim) && (full[i] == true)){
+                        full[i] = false;
                     }
                 }
                 sem_post(&mutex);

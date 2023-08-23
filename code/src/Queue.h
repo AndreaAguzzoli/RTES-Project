@@ -54,7 +54,11 @@ class Queue{
         void push(T element, int priority = -1); // inserisce in fondo alla coda FIFO l'elemento indicato (default) o in fondo alla coda relativa ad un certo livello di priorità (code multiple)
 
     private:
-        bool empty=true, full=false;
+        //bool empty=true, full=false;
+        /* Le variabili 'empty' e 'full' servono per indicare lo stato della coda. Tuttavia ho bisogno di un array nel caso delle code multiple, in modo da poter avere un valore per ogni livello di priorità. */
+        bool* empty;
+        bool* full;
+
         int type;
         int levels;
         T **queue;

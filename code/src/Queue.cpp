@@ -39,6 +39,8 @@ Queue<T>::Queue(int type, int levels, size_t dim){
     this->head = (int*)malloc(this->levels*sizeof(int));
     this->tail = (int*)malloc(this->levels*sizeof(int));
     this->numElementi = (int*)malloc(this->levels*sizeof(int));
+    this->empty = (int*)malloc(this->levels*sizeof(int));
+    this->full = (int*)malloc(this->levels*sizeof(int));
 
     this->queue = (T**)malloc(this->dim*sizeof(T*));
     for(int i=0; i<this->levels; ++i){
@@ -51,6 +53,8 @@ Queue<T>::Queue(int type, int levels, size_t dim){
         this->head[i] = 0;
         this->tail[i] = -1;
         this->numElementi[i] = 0;
+        this->empty[i] = true;
+        this->full[i] = false;
         
     }
 }
@@ -70,10 +74,14 @@ Queue<T>::Queue(size_t dim){
     this->head = (int*)malloc(1*sizeof(int));
     this->tail = (int*)malloc(1*sizeof(int));
     this->numElementi = (int*)malloc(1*sizeof(int));
+    this->empty = (int*)malloc(this->1*sizeof(int));
+    this->full = (int*)malloc(this->1*sizeof(int));
+
     this->head[0] = 0;
     this->tail[0] = -1;
     this->numElementi[0] = 0;
-
+    this->empty[0] = true;
+    this->full[0] = false;
 
     this->queue = (T**)malloc(this->dim*sizeof(T*));
     for(int i=0; i<this->dim; ++i)
@@ -117,9 +125,9 @@ void Queue<T>::pop (int priority) {
                 --numElementi[0];
                 // controllo se aggiornare i valori delle variabili 'empty' e 'full'
                 if (numElementi[0] == 0) 
-                    empty = true;
-                else if ((numElementi[0] != dim) && (full == true)){
-                    full = false;
+                    empty[0] = true;
+                else if ((numElementi[0] != dim) && (full[0] == true)){
+                    full[0] = false;
                 }
             }
             else {
@@ -144,9 +152,9 @@ void Queue<T>::pop (int priority) {
                         --numElementi[i];
                         // controllo se aggiornare i valori delle variabili 'empty' e 'full'
                         if (numElementi[i] == 0) 
-                            empty = true;
-                        else if ((numElementi[i] != dim) && (full == true)){
-                            full = false;
+                            empty[i] = true;
+                        else if ((numElementi[i] != dim) && (full[i] == true)){
+                            full[i] = false;
                         }
                     }
                     else {
@@ -175,9 +183,9 @@ void Queue<T>::push (T element, int priority) {
                 ++numElementi[0];
                 // controllo se aggiornare i valori delle variabili 'empty' e 'full'
                 if (numElementi[0] == dim) 
-                    full = true;
-                else if ((numElementi[0] != 0) && (empty == true)){
-                    empty = false;
+                    full[0] = true;
+                else if ((numElementi[0] != 0) && (empty[0] == true)){
+                    empty[0] = false;
                 }
             }
             else {
@@ -202,9 +210,9 @@ void Queue<T>::push (T element, int priority) {
                         ++numElementi[i];
                         // controllo se aggiornare i valori delle variabili 'empty' e 'full'
                         if (numElementi[i] == 0) 
-                            full = true;
-                        else if ((numElementi[i] != 0) && (empty == true)){
-                            empty = false;
+                            full[i] = true;
+                        else if ((numElementi[i] != 0) && (empty[i] == true)){
+                            empty[i] = false;
                         }
                     }
                     else {
