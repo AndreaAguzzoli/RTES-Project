@@ -111,6 +111,9 @@ void Queue<T>::setLevels(int newlevels){
         free(this->queue[i]);
     this->levels = newlevels;
 }
+template<calss T>::getLevels(){
+    return this->levels;
+}
 
 template<class T>
 T Queue<T>::pop (int priority) {
@@ -149,7 +152,6 @@ T Queue<T>::pop (int priority) {
         this->full[priority] = false;
     return ret;
 }
-
 template<class T>
 void Queue<T>::push (T element, int priority) {
     if(priority >= this->levels || priority < -1){
