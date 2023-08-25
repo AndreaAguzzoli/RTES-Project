@@ -1,6 +1,5 @@
 #include<iostream>
 #include<stdlib.h>
-#include<pthread.h>
 #include"Queue.h"
 using namespace std;
 
@@ -46,17 +45,31 @@ Queue<T>::Queue(int type, int levels, size_t dim){
     this->push_next = (int*)malloc(this->levels*sizeof(int));
 
     this->tot = (int*)malloc(this->levels*sizeof(int));
+    
+    this->sem_full = (sem_t*)malloc(THREADS*sizeof(sem_t));
+    this->sem_empty = (sem_t**)malloc(this->levels*sizeof(sem_t*));
+    sem_init(&this->mutex, 1);
+
+    this->push_block = (int*)malloc(this->levels*sizeof(int));
 
     for(int i=0; i<this->levels; ++i){
         this->queue[i] = (T*)malloc(this->dim*sizeof(T));
+        this->sem_full[i] = (sem_t*)malloc((THREADS)*sizeof(sem_t))
         this->empty[i] = true;
         this->full[i] = false;
         this->tot[i] = 0;
         this->pop_next[i] = 0;
         this->push_next[i] = 0;
+        this->push_block[i] = 0;
 
         if(this->type == FIFO)
             break;
+    }
+    for(int i=0; i<THREADS; ++i){
+        sem_init(&this->sem_empty, 0);
+        sem_init(this->sem_full, 0);
+        for(int j=0; j<this->levels; ++j)
+            sem_init(&this->sem_full[j][i], 0);
     }
     
 }
@@ -84,6 +97,19 @@ Queue<T>::Queue(size_t dim){
     this->pop_next[0] = 0;
     this->push_next = (int*)malloc(sizeof(int));
     this->push_next[0] = 0;
+
+    this->push_block = (int*)malloc(this->levels*sizeof(int));
+    for(int i=0; i<this->levels; ++i)
+        this->push_block[i] = 0;
+
+    this->sem_full = (sem_t**)malloc(sizeof(sem_t*));
+    this->sem_full[0] = (sem_t*)malloc(THREADS*sizeof(sem_t));
+    this->sem_empty = (sem_t*)malloc(THREADS*sizeof(sem_t));
+    for(int i=0; i<THREADS; ++i){
+        sem_init(&this->sem_empty, 0);
+        sem_init(this->sem_full[0], 0);
+    }
+    sem_init(&this->mutex, 1);
 
     this->queue = (T**)malloc(sizeof(T*));
     this->queue[0] = (T*)malloc(this->dim*sizeof(T));
@@ -116,28 +142,32 @@ template<calss T>::getLevels(){
 }
 
 template<class T>
-T Queue<T>::pop (int priority) {
+T Queue<T>::pop () {
     if(priority >= this->levels || priority < -1){
         cout << "Impossibile eseguire la POP. Priorità specificata non valida." << endl;
         return NULL;
     }
+    sem_wait(&this->mutex);
     if (this->type == FIFO)
         ++priority; //Priorità 0.
     else if(priority == -1){
         //Comportamento di default del metodo per le code multiple.
         ++priority;
-        while(this->empty[priority]) 
+        while(priority < this->levels && this->empty[priority]) 
             ++priority;
         if(priority >= this->levels){
-            cout << "Tutte le code risultano vuote." << endl;
-            return NULL;
-        }
-    }
-    else{
-        //Priorità specificata esplicitamente per le code multiple.
-        if(this->empty[priority]){
-            cout << "La coda da cui si vuole estrarre l'elemento risulta essere vuota." << endl;
-            return NULL;
+            /*
+            Ora è necessario bloccarsi in attesa che qualcuno inserica un valore all'interno della coda.
+            */
+            priority = 0;
+            ++this->pop_block;
+            sem_post(&this->mutex);
+            sem_wait($this->sem_empty[this->pop_block-1]);
+            /*
+            Nel momento in cui si viene risvegliati si ha la certezza che nella coda si dispone di un elemento da poppare.
+            */
+            while(priority < this->levels && this->empty[priority]) 
+                ++priority;
         }
     }
 
@@ -148,8 +178,14 @@ T Queue<T>::pop (int priority) {
     if (this->pop_next[priority] == this->push_next[priority]) 
         //Se dopo una pop i due puntatori coincidono, allora l'array è vuoto
         this->empty[priority] == true;
-        if(this->full[priority])
+    if(this->full[priority]){
         this->full[priority] = false;
+        if(this->push_block){
+            --this->push_block[priority];
+            sem_post($this->sem_full[priority][this->push_block]);
+        } else sem_post(&this->mutex);
+    }
+
     return ret;
 }
 template<class T>
@@ -162,19 +198,23 @@ void Queue<T>::push (T element, int priority) {
         cout << "Si sta tentando di inserire un elemento NULL." << endl;
         return;
     }
+    sem_wait(&this->mutex);
     else if(priority == -1){
         //Consideriamo la coda gestita come FIFO
         if(this->type != FIFO){
-        cout << "Non è possibile inserire un elemento in una coda multipla senza specificare il livello di priorità." << endl;
-        return;
+            cout << "Non è possibile inserire un elemento in una coda multipla senza specificare il livello di priorità." << endl;
+            sem_post(&this->mutex);
+            return;
         }
         ++priority; //Priorità 0.
     }
     else{
         //Priorità specificata esplicitamente per le code multiple.
         if(this->full[priority]){
-            cout << "La coda in cui si vuole inserire l'elemento risulta essere piena." << endl;
-            return NULL;
+            //La coda è piena ed è necessario bloccarsi.
+            ++this->push_block[priority];
+            sem_wait(&this->sem_full[priority][this->push_block-1]);
+            //Se si viene risvegliati si ha la certezza che vi è uno slot in cui inserire l'elemento. Per questo motivo non occorrono controlli.
         }
     }
 
@@ -185,8 +225,13 @@ void Queue<T>::push (T element, int priority) {
     if (this->pop_next[priority] == this->push_next[priority]) 
         //Se dopo una push i due puntatori coincidono, allora l'array è pieno
         this->full[priority] == true;
-        if(this->empty[priority])
+    if(this->empty[priority]){
         this->empty[priority] = false;
+        if(this->pop_block){
+            --this->pop_block;
+            sem_post($this->sem_empty[this->pop_block]);
+        } else sem_post(&this->mutex);
+    }
     return ret;
 }
 

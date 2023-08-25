@@ -1,5 +1,8 @@
 #ifndef QUEUE_H
 #define QUEUE_H
+
+#include<pthread.h>
+#include<semaphore.h>
 using namespace std;
 
 //Macro per identificare il tipo di gestione della coda
@@ -14,6 +17,9 @@ using namespace std;
 #endif
 #ifndef DIM
 #define DIM 100
+#endif
+#ifndef THREADS
+#define THREADS 2000
 #endif
 
 template<class T>
@@ -43,33 +49,41 @@ class Queue{
 
         void setLevels(int);
 
-        void setType(int);
-
         int getLevels(); //Ritorna il numero di livelli della coda (che coincide con la priorità massima)
 
-        int getType(); //Ritorna il tipo di coda.
+        T pop();/*
+        Estrae il primo elemento della coda NON VUOTA di più alta priorità.
+        */
 
-        void pop(int priority = -1); // estrae l'elemento in testa alla coda FIFO (default) o alla coda relativa ad un certo livello di priorità (code multiple)
-
-        void push(T element, int priority = -1); // inserisce in fondo alla coda FIFO l'elemento indicato (default) o in fondo alla coda relativa ad un certo livello di priorità (code multiple)
+        void push(T element, int priority = -1);/*
+        Inserisce l'elemento passato nella coda di priorità specificata (se a code multiple). Per utilizzare la push sulla coda FIFO, NON SPECIFICARE la priorità, oppure usare 0.
+        */
 
     private:
-        //bool empty=true, full=false;
-        /* Le variabili 'empty' e 'full' servono per indicare lo stato della coda. Tuttavia ho bisogno di un array nel caso delle code multiple, in modo da poter avere un valore per ogni livello di priorità. */
         bool* empty;
-        bool* full;
+        bool* full;/*
+        EMPTY e FULL sono due array lunghi quanto il numero di livelli di priorità presenti. Ogni posizione indica se la coda del corrispondente livello di priorità è piena o vuota.
+        */
 
         int type;
         int levels;
         T **queue;
         int dim;
 
-        /*
-        I seguenti 3 interi servono per la gestione dell'array circolare che compone la coda. "head" indica il primo elemento inserito, mentre "tail" indica l'ultimo inserito. Significa che nel momento in cui non ci sono elementi o nel momento in cui ce n'è 1 solo hanno lo stesso valore. Mentre nel momento in cui tail è il precedente di head significa che l'array è pieno. Per distinguere se l'array è pieno o vuoto abbiamo quindi bisogno della variabile "numElementi".
-        Quando viene estratto un elemento il valore di "head" si incrementa di una unità, mentre nel momento il cui viene inserito un elemento si incrementa il valore di "tail".
+        int *pop_next; //Indici degli elementi per ogni livello di priorità da poppare
+        int *push_next; //Indice del primo spazio libero per ogni livello di priorità; ovvero l'indice della posizione in cui eventualmente inserire un nuovo elemento.
+        int *tot; /*
+        Numero di elementi per ogni livello di priorità (utile per debugging, quindi lasciato anche agli utilizzatori). Si potrebbe utilizzare al posto di empty e full,
+        ma per coerenza alla letteratura si mantengono anche quelli.
         */
-        int* head; //indica il primo elemento occupato
-        int* tail; //indica l'ultimo elemento occupato
-        int* numElementi; //indica il numero di elementi presenti nell'array per capire se è pieno o vuoto
+
+        int* push_block; //È un array perché indicizza il prossimo che dovrà essere svegliato, ma si ha un indice per ogni livello di priorità.
+        int pop_block = 0; //Per tenere traccia di quanti si sono bloccati in lettura (per come è implementata la sincronizzazione, permette il risveglio selettivo in ordine FIFO).
+        sem_t mutex; //Per accedere in maniera mutuamente esclusiva alla coda.
+        sem_t* sem_empty; //Semaforo su cui si blocca chi vuole leggere ma la coda è vuota.
+        sem_t** sem_full; /*
+        È una matrice perché i pushers si bloccano selettivamente su uno specifico livello di priorità. È questa matrice è l'unica soluzione che mi è venuta in mente per un risveglio
+        selettivo sia in termini di livello di priorità che per mantenere l'ordine FIFO.
+        */
 };
 #endif
