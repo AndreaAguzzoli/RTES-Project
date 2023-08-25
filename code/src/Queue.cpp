@@ -1,5 +1,6 @@
 #include<iostream>
 #include<stdlib.h>
+#include<pthread.h>
 #include"Queue.h"
 using namespace std;
 
@@ -35,28 +36,29 @@ Queue<T>::Queue(int type, int levels, size_t dim){
         return;
     }
 
-    // dichiarazione primoVuoto e primoPieno (array con un solo slot)
-    this->head = (int*)malloc(this->levels*sizeof(int));
-    this->tail = (int*)malloc(this->levels*sizeof(int));
-    this->numElementi = (int*)malloc(this->levels*sizeof(int));
-    this->empty = (int*)malloc(this->levels*sizeof(int));
-    this->full = (int*)malloc(this->levels*sizeof(int));
+    this->queue = (T**)malloc(this->levels*sizeof(T*));
+    this->queue[0] = (T*)malloc(this->dim*sizeof(T));
 
-    this->queue = (T**)malloc(this->dim*sizeof(T*));
+    this->empty = (bool*)malloc(this->levels*sizeof(bool));
+    this->full = (bool*)malloc(this->levels*sizeof(bool));
+
+    this->pop_next = (int*)malloc(this->levels*sizeof(int));
+    this->push_next = (int*)malloc(this->levels*sizeof(int));
+
+    this->tot = (int*)malloc(this->levels*sizeof(int));
+
     for(int i=0; i<this->levels; ++i){
-        if(type>FIFO)
-            this->queue[i] = (T*)malloc(this->dim*sizeof(T));
-        else
-            this->queue[i] = (T*)malloc(sizeof(T));
-        this->queue[i][0] = 0;
-        
-        this->head[i] = 0;
-        this->tail[i] = -1;
-        this->numElementi[i] = 0;
+        this->queue[i] = (T*)malloc(this->dim*sizeof(T));
         this->empty[i] = true;
         this->full[i] = false;
-        
+        this->tot[i] = 0;
+        this->pop_next[i] = 0;
+        this->push_next[i] = 0;
+
+        if(this->type == FIFO)
+            break;
     }
+    
 }
 
 template<class T>
@@ -70,22 +72,21 @@ Queue<T>::Queue(size_t dim){
     this->levels = 1;
     this->dim = dim;
 
-    // dichiarazione primoVuoto e primoPieno (array con un solo slot)
-    this->head = (int*)malloc(1*sizeof(int));
-    this->tail = (int*)malloc(1*sizeof(int));
-    this->numElementi = (int*)malloc(1*sizeof(int));
-    this->empty = (int*)malloc(this->1*sizeof(int));
-    this->full = (int*)malloc(this->1*sizeof(int));
-
-    this->head[0] = 0;
-    this->tail[0] = -1;
-    this->numElementi[0] = 0;
+    this->empty = (bool*)malloc(siezof(bool));
     this->empty[0] = true;
+    this->full = (bool*)malloc(sizeof(bool));
     this->full[0] = false;
 
-    this->queue = (T**)malloc(this->dim*sizeof(T*));
-    for(int i=0; i<this->dim; ++i)
-        this->queue[i] = (T*)malloc(sizeof(T));
+    this->tot = (int*)malloc(sizeof(int));
+    this->tot[0] = 0;
+
+    this->pop_next = (int*)malloc(sizeof(int));
+    this->pop_next[0] = 0;
+    this->push_next = (int*)malloc(sizeof(int));
+    this->push_next[0] = 0;
+
+    this->queue = (T**)malloc(sizeof(T*));
+    this->queue[0] = (T*)malloc(this->dim*sizeof(T));
 }
 
 template<class T>
@@ -111,81 +112,61 @@ void Queue<T>::setLevels(int newlevels){
     this->levels = newlevels;
 }
 
-/*la variabile result dovrebbe essere quella che ritorna il valore del dato estratto, se serve bisognerebbe trasformare la POP in una funzione che ritorna un intero*/
 template<class T>
-void Queue<T>::pop (int priority) {
-    T result;
-    if (type == FIFO) {
-        // in questo caso la coda è di tipo FIFO
-        //pthread_mutex_lock(&mutex);
-        try {
-            if (numElementi != 0) {     // se la coda non è vuota allora ...
-                result = queue[head[0]];
-                head[0] = (head[0] + 1) % dim;
-                --numElementi[0];
-                // controllo se aggiornare i valori delle variabili 'empty' e 'full'
-                if (numElementi[0] == 0) 
-                    empty[0] = true;
-                else if ((numElementi[0] != dim) && (full[0] == true)){
-                    full[0] = false;
-                }
-            }
-            else {
-                throw -1;
-            }
-        }
-        catch (...) {
-            cout << "ERRORE: La coda è vuota e non è possibile eseguire la POP.\n";
-        }
-        //pthread_mutex_unlock(&mutex);
+T Queue<T>::pop (int priority) {
+    if(priority >= this->levels || priority < -1){
+        cout << "Impossibile eseguire la POP. Priorità specificata non valida." << endl;
+        return NULL;
     }
-    else {
-        // in questo caso la funzione deve lavorare sulla coda relativa ad un certo livello di priorità
-        for (int i=0; i<this->levels; i++) {
-            //scorro i livelli di priorità finchè non trovo quello specificato come parametro
-            if (priority == i) { 
-                //pthread_mutex_lock(&mutex);
-                try {
-                    if (numElementi[i] != 0) {  // se la coda indicata non è vuota allora ...
-                        result = queue[head[i]];
-                        head[i] = (head[i] + 1) % dim;
-                        --numElementi[i];
-                        // controllo se aggiornare i valori delle variabili 'empty' e 'full'
-                        if (numElementi[i] == 0) 
-                            empty[i] = true;
-                        else if ((numElementi[i] != dim) && (full[i] == true)){
-                            full[i] = false;
-                        }
-                    }
-                    else {
-                        throw -1;
-                    }
-                }
-                catch (...) {
-                    cout << "ERRORE: La coda di priorità indicata è vuota, quindi non è possibile eseguire la POP.\n";
-                }
-                //pthread_mutex_unlock(&mutex);
-                break;
-            }
+    if (this->type == FIFO)
+        ++priority; //Priorità 0.
+    else if(priority == -1){
+        //Comportamento di default del metodo per le code multiple.
+        ++priority;
+        while(this->empty[priority]) 
+            ++priority;
+        if(priority >= this->levels){
+            cout << "Tutte le code risultano vuote." << endl;
+            return NULL;
         }
     }
+    else{
+        //Priorità specificata esplicitamente per le code multiple.
+        if(this->empty[priority]){
+            cout << "La coda da cui si vuole estrarre l'elemento risulta essere vuota." << endl;
+            return NULL;
+        }
+    }
+
+    T ret = this->queue[priority][this->pop_next[priority]];
+    this->pop_next[priority] = (++this->pop_next[priority])%this->dim;
+    --this->tot[priority];
+        
+    if (this->pop_next[priority] == this->push_next[priority]) 
+        //Se dopo una pop i due puntatori coincidono, allora l'array è vuoto
+        this->empty[priority] == true;
+        if(this->full[priority])
+        this->full[priority] = false;
+    return ret;
 }
 
 template<class T>
 void Queue<T>::push (T element, int priority) {
-    if (type == FIFO) {
+    if (priority == 0) {
         // in questo caso la coda è di tipo FIFO
         //pthread_mutex_lock(&mutex);
         try {            
-            if ( numElementi[0] != dim ) { // se l'array non è pieno allora ...
-                tail[0] = (tail[0] + 1) % dim;
-                queue[tail[0]] = element;
-                ++numElementi[0];
-                // controllo se aggiornare i valori delle variabili 'empty' e 'full'
-                if (numElementi[0] == dim) 
-                    full[0] = true;
-                else if ((numElementi[0] != 0) && (empty[0] == true)){
-                    empty[0] = false;
+            if (full == false) {
+                // inserisci elemento quando trovo una posizione libera
+                for (int i=0; i<this->dim; i++){                    
+                    if (queue[i] == NULL) {
+                        // trovata una posizione vuota, posso inserire qui il nuovo elemento
+                        queue[i] = element;
+                        if (empty == true) { // se la coda era vuota ora segno che non lo è più
+                            empty = false;
+                        }
+                        break;
+                    }                    
                 }
             }
             else {
@@ -203,16 +184,21 @@ void Queue<T>::push (T element, int priority) {
             //scorro i livelli di priorità finchè non trovo quello specificato come parametro
             if (priority == i) { 
                 //pthread_mutex_lock(&mutex);
+                bool isFull = true;
+                for (int j=0; j<this->dim; j++) {
+                    if (queue[i][j] == NULL) {
+                        isFull = false;
+                        break;
+                    }
+                }
                 try {
-                    if ( numElementi[i] != dim ) { // se l'array non è pieno allora ...
-                        tail[i] = (tail[i] + 1) % dim;
-                        queue[tail[i]] = element;
-                        ++numElementi[i];
-                        // controllo se aggiornare i valori delle variabili 'empty' e 'full'
-                        if (numElementi[i] == 0) 
-                            full[i] = true;
-                        else if ((numElementi[i] != 0) && (empty[i] == true)){
-                            empty[i] = false;
+                    if (isFull == false) {
+                        for (int j=0; j<this->dim; j++) {
+                            if (queue[i][j] == NULL) {
+                                // trovata una posizione vuota, posso inserire qui il nuovo elemento
+                                queue[i][j] = element;
+                                break;
+                            }
                         }
                     }
                     else {
