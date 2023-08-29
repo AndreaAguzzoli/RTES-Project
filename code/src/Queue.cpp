@@ -46,8 +46,8 @@ Queue<T>::Queue(int type, int levels, size_t dim){
 
     this->tot = (int*)malloc(this->levels*sizeof(int));
     
-    this->sem_full = (sem_t*)malloc(THREADS*sizeof(sem_t));
-    this->sem_empty = (sem_t**)malloc(this->levels*sizeof(sem_t*));
+    this->sem_empty = (sem_t*)malloc(THREADS*sizeof(sem_t));
+    this->sem_full = (sem_t**)malloc(this->levels*sizeof(sem_t*));
     sem_init(&this->mutex, 1);
 
     this->push_block = (int*)malloc(this->levels*sizeof(int));
@@ -66,8 +66,7 @@ Queue<T>::Queue(int type, int levels, size_t dim){
             break;
     }
     for(int i=0; i<THREADS; ++i){
-        sem_init(&this->sem_empty, 0);
-        sem_init(this->sem_full, 0);
+        sem_init(&this->sem_empty[i], 0);
         for(int j=0; j<this->levels; ++j)
             sem_init(&this->sem_full[j][i], 0);
     }
@@ -142,7 +141,7 @@ template<calss T>::getLevels(){
 }
 
 template<class T>
-T Queue<T>::pop () {
+T Queue<T>::pop (int priority) {
     if(priority >= this->levels || priority < -1){
         cout << "Impossibile eseguire la POP. Priorità specificata non valida." << endl;
         return NULL;
@@ -163,6 +162,7 @@ T Queue<T>::pop () {
             ++this->pop_block;
             sem_post(&this->mutex);
             sem_wait($this->sem_empty[this->pop_block-1]);
+            sem_wait(&this->mutex);
             /*
             Nel momento in cui si viene risvegliati si ha la certezza che nella coda si dispone di un elemento da poppare.
             */
@@ -177,29 +177,34 @@ T Queue<T>::pop () {
         
     if (this->pop_next[priority] == this->push_next[priority]) 
         //Se dopo una pop i due puntatori coincidono, allora l'array è vuoto
-        this->empty[priority] == true;
+        this->empty[priority] = true;
     if(this->full[priority]){
         this->full[priority] = false;
-        if(this->push_block){
+        if(this->push_block[priority]){
             --this->push_block[priority];
-            sem_post($this->sem_full[priority][this->push_block]);
-        } else sem_post(&this->mutex);
+            sem_post($this->sem_full[priority][this->push_block[priority]]);
+        }
     }
-
+    
+    sem_post(&this->mutex);
     return ret;
 }
+
+
 template<class T>
 void Queue<T>::push (T element, int priority) {
     if(priority >= this->levels || priority < -1){
-        cout << "Impossibile eseguire la POP. Priorità specificata non valida." << endl;
+        cout << "Impossibile eseguire la PUSH. Priorità specificata non valida." << endl;
         return;
     }
     else if(element == NULL){
         cout << "Si sta tentando di inserire un elemento NULL." << endl;
         return;
     }
+
     sem_wait(&this->mutex);
-    else if(priority == -1){
+
+    if(priority == -1){
         //Consideriamo la coda gestita come FIFO
         if(this->type != FIFO){
             cout << "Non è possibile inserire un elemento in una coda multipla senza specificare il livello di priorità." << endl;
@@ -208,31 +213,35 @@ void Queue<T>::push (T element, int priority) {
         }
         ++priority; //Priorità 0.
     }
-    else{
-        //Priorità specificata esplicitamente per le code multiple.
-        if(this->full[priority]){
-            //La coda è piena ed è necessario bloccarsi.
-            ++this->push_block[priority];
-            sem_wait(&this->sem_full[priority][this->push_block-1]);
-            //Se si viene risvegliati si ha la certezza che vi è uno slot in cui inserire l'elemento. Per questo motivo non occorrono controlli.
-        }
+
+    if(this->full[priority]){
+        //La coda è piena ed è necessario bloccarsi.
+        ++this->push_block[priority];
+        sem_post(&this->mutex);
+        sem_wait(&this->sem_full[priority][this->push_block[priority]-1]);
+        sem_wait(&this->mutex);
+        //Se si viene risvegliati si ha la certezza che vi è uno slot in cui inserire l'elemento. Per questo motivo non occorrono controlli.
     }
+    
 
     this->queue[priority][this->push_next[priority]] = element;
-    this->push_next[priority] = (++this->push_next[priority])%this->dim;
+    this->push_next[priority] = (this->push_next[priority] + 1) % this->dim;
     ++this->tot[priority];
         
-    if (this->pop_next[priority] == this->push_next[priority]) 
+    if (this->pop_next[priority] == this->push_next[priority]) {
         //Se dopo una push i due puntatori coincidono, allora l'array è pieno
-        this->full[priority] == true;
-    if(this->empty[priority]){
+        this->full[priority] = true;                                           
+    }
+    else if(this->empty[priority]){
         this->empty[priority] = false;
         if(this->pop_block){
             --this->pop_block;
             sem_post($this->sem_empty[this->pop_block]);
-        } else sem_post(&this->mutex);
+        } 
+            
     }
-    return ret;
+
+    sem_post(&this->mutex);
 }
 
 int main(void){
