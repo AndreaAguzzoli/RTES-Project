@@ -51,11 +51,13 @@ class Queue{
 
         int getLevels(); //Ritorna il numero di livelli della coda (che coincide con la priorità massima)
 
-        T pop();/*
+        T popBestEffort(int priority = -1);
+        T popReliability(int priority = -1);/*
         Estrae il primo elemento della coda NON VUOTA di più alta priorità.
         */
 
-        void push(T element, int priority = -1);/*
+        void pushBestEffort(T element, int priority = -1);
+        void pushReliability(T element, int priority = -1);/*
         Inserisce l'elemento passato nella coda di priorità specificata (se a code multiple). Per utilizzare la push sulla coda FIFO, NON SPECIFICARE la priorità, oppure usare 0.
         */
 
@@ -78,9 +80,9 @@ class Queue{
         */
 
         int* push_block; //È un array perché indicizza il prossimo che dovrà essere svegliato, ma si ha un indice per ogni livello di priorità.
-        int pop_block = 0; //Per tenere traccia di quanti si sono bloccati in lettura (per come è implementata la sincronizzazione, permette il risveglio selettivo in ordine FIFO).
+        int* pop_block; //Per tenere traccia di quanti si sono bloccati in lettura (per come è implementata la sincronizzazione, permette il risveglio selettivo in ordine FIFO).
         sem_t mutex; //Per accedere in maniera mutuamente esclusiva alla coda.
-        sem_t* sem_empty; //Semaforo su cui si blocca chi vuole leggere ma la coda è vuota.
+        sem_t** sem_empty; //Semaforo su cui si blocca chi vuole leggere ma la coda è vuota.
         sem_t** sem_full; /*
         È una matrice perché i pushers si bloccano selettivamente su uno specifico livello di priorità. È questa matrice è l'unica soluzione che mi è venuta in mente per un risveglio
         selettivo sia in termini di livello di priorità che per mantenere l'ordine FIFO.
