@@ -1,202 +1,493 @@
-/*gcc provaReliability.cpp -pthread -lstdc++ -o provaReliability*/
-
 #include <iostream>
+#include <stdlib.h>
 #include <semaphore.h>
 #include <pthread.h>
-#include <stdlib.h>
 #include <unistd.h>
 using namespace std;
 
-sem_t mutex; // semaforo che va inizializzato a 1
-sem_t semPush, semPop; // semafori che vanno inizializzato a 0
-int pushBloccati = 0, popBloccati = 0;
+#ifndef FIFO
+#define FIFO 0
+#define MULTIPLE 1
+#define THREADS 20
+#endif
 
-int* head; //indica il primo elemento occupato
-int* tail; //indica l'ultimo elemento occupato
-int* numElementi; //indica il numero di elementi presenti nell'array per capire se è pieno o vuoto
+
+
+int type;
+int righe;
+int colonne;
+int* pop_next; //indica il primo elemento occupato
+int* push_next; //indica l'ultimo elemento occupato
+int* push_block;
+int* pop_block;
+int* tot; //indica il numero di elementi presenti nell'array per capire se è pieno o vuoto
 int dim;
-int* myArray;
-bool empty = true, full = false;
- 
+int** myArray;
+bool* empty;
+bool* full;
+sem_t mutex; //Per accedere in maniera mutuamente esclusiva alla coda.
+sem_t* sem_empty; //Semaforo su cui si blocca chi vuole leggere ma la coda è vuota.
+sem_t* sem_full; //matrice di semafori
+
 void showArray();
 
-void startPush () {
-    sem_wait(&mutex);
-    /*per garantire l'inserimento del dato all'interno della coda, il thread si blocca su un semaforo apposito se non ci sono le condizioni di inserimento (coda piena), altrimenti prosegue al suo inserimento. Questo garantisce che il dato verrà inserito nel momento in cui il thread verrà risvegliato perchè ci sono nuovamente condizioni favorevoli all'inserimento (coda non più piena).*/
-    if (numElementi[0] != dim) {
-        // ci sono le condizioni (coda NON piena)
-        sem_post(&semPush);
+
+
+/*int pop (int priority) {
+
+    if(priority >= righe || priority < -1){
+        cout << "Impossibile eseguire la POP. Priorità specificata non valida." << endl;
+        return -1;
+    }
+
+    
+
+    if (priority == -1) {
+        if (type == FIFO) {
+            ++priority; //Priorità 0.
+            //controllo se la coda è vuota 
+            if (empty[priority]) {
+                //se si si blocca in attesa che ci sia un elemento
+                ++pop_block;
+                sem_post(&mutex);
+                sem_wait(&sem_empty[priority]);
+                sem_wait(&mutex);
+            }
+        }
+        else {
+            //Comportamento di default del metodo per le code multiple.
+            ++priority;
+            while(priority < righe && empty[priority]) {
+                ++priority;
+            }
+            if(priority >= righe){            
+                //Ora è necessario bloccarsi in attesa che qualcuno inserica un valore all'interno della coda.            
+                priority = 0;
+                ++pop_block;
+                sem_post(&mutex);
+                sem_wait(&sem_empty[priority]);
+                sem_wait(&mutex);            
+                //Nel momento in cui si viene risvegliati si ha la certezza che nella coda si dispone di un elemento da poppare.
+                while(priority < righe && empty[priority]) {
+                    ++priority;
+                }
+            }
+        }
     }
     else {
-        pushBloccati++;        
+        if (type == FIFO) {
+            cout << "Non è possibile specificare il grado di priorità in una coda FIFO";
+            return -2;
+        }
+        else {
+            //è stata specificata una coda di priorità e ora devo controllare se è vuota o se si può procedere
+            if (empty[priority]) {
+                //si blocca in attesa che ci sia almeno un elemento
+                do {
+                    ++pop_block;
+                    sem_post(&mutex);
+                    sem_wait(&sem_empty[priority]);
+                    sem_wait(&mutex);
+                } while (empty[priority]);
+            }
+        }
     }
-    sem_post(&mutex);
 
-    sem_wait(&semPush);
+
+    int ret = myArray[priority][pop_next[priority]];
+    myArray[priority][pop_next[priority]] = -1;
+    pop_next[priority] = (pop_next[priority] + 1) % dim;
+    --tot[priority];
+        
+    if (pop_next[priority] == push_next[priority]) {
+        //Se dopo una pop i due puntatori coincidono, allora l'array è vuoto
+        empty[priority] = true;
+    }
+    else if(full[priority]){
+        full[priority] = false;
+    }
+
+    if (push_block[priority] > 0 && !full[priority]) {
+        --push_block[priority];
+        sem_post(&sem_full[priority]);
+    }
+    else if (pop_block > 0 && !empty[priority]) {
+        --pop_block;
+        sem_post(&sem_empty[priority]);
+    }
+
+    
+    sem_post(&mutex);
+    return ret;
 }
 
-void endPush () {
-    sem_wait(&mutex);
-    /* se ci sono estrazioni bloccate ne sblocco una per prima per evitare la starvation delle POP, se non ci sono e invece ci sono inserimenti bloccati sblocco uno di loro. */
-    if (popBloccati > 0) {
-        popBloccati--;
-        sem_post(&semPop);
-    } 
-    else if (pushBloccati > 0) {
-        pushBloccati--;
-        sem_post(&semPush);
+
+void push (int element, int priority) {
+    if(priority >= righe || priority < -1){
+        cout << "Impossibile eseguire la PUSH. Priorità specificata non valida." << endl;
+        return;
     }
+    else if(element == NULL){
+        cout << "Si sta tentando di inserire un elemento NULL." << endl;
+        return;
+    }
+
+    sem_wait(&mutex);
+
+    if(priority == -1){
+        //Consideriamo la coda gestita come FIFO
+        if(type != FIFO){
+            cout << "Non è possibile inserire un elemento in una coda multipla senza specificare il livello di priorità." << endl;
+            sem_post(&mutex);
+            return;
+        }
+        ++priority; //Priorità 0.
+    }
+    if(full[priority]){
+        //La coda è piena ed è necessario bloccarsi.
+        do {
+            ++push_block[priority];
+            sem_post(&mutex);
+            sem_wait(&sem_full[priority]);
+            sem_wait(&mutex);           
+        } while (full[priority]); 
+        //Se si viene risvegliati si ha la certezza che vi è uno slot in cui inserire l'elemento. Per questo motivo non occorrono controlli.
+    }
+
+    myArray[priority][push_next[priority]] = element;
+    push_next[priority] = (push_next[priority] + 1) % dim;
+    ++tot[priority];
+        
+    if (pop_next[priority] == push_next[priority]) {
+        //Se dopo una push i due puntatori coincidono, allora l'array è pieno
+        full[priority] = true;
+    }
+    else if(empty[priority]){
+        empty[priority] = false;         
+    }
+
+    if(pop_block > 0 && !empty[priority]){
+        --pop_block;
+        sem_post(&sem_empty[priority]);
+    }    
+    else if(push_block > 0 && !full[priority]) {
+        --push_block[priority];
+        sem_post(&sem_full[priority]);
+    }
+
     sem_post(&mutex);
 }
+*/
 
-void startPop () {
+
+int pop (int priority) {
+
     sem_wait(&mutex);
-    /*per garantire l'estrazione del dato all'interno della coda, il thread si blocca su un semaforo apposito se non ci sono le condizioni di inserimento (coda vuota), altrimenti prosegue alla sua estrazione. Questo garantisce che il dato verrà estratto nel momento in cui il thread verrà risvegliato perchè ci sono nuovamente condizioni favorevoli all'estrazione (coda non più vuota).*/
-    if (numElementi[0] != 0) {
-        // ci sono le condizioni (coda NON vuota)
-        sem_post(&semPop);
+    if(priority >= righe || priority < -1){
+        cout << "Impossibile eseguire la POP. Priorità specificata non valida." << endl;
+        return -1;
+    }
+    if (priority == -1) {
+        if (type == FIFO) {
+            ++priority;
+            if (!empty[priority]) {
+                sem_post(&sem_empty[priority]);
+            }
+            else {
+                pop_block[priority]++;
+            }
+        }
+        else {
+            //code multiple default (posiziona sulla prima coda non vuota se c'è)
+            do {
+                ++priority;
+                if (priority > righe) {
+                    //le code sono tutte vuote (si deve attendere)
+                    priority = -1;
+                    break;
+                }
+            } while (empty[priority]);
+            if (priority != -1) {
+                sem_post(&sem_empty[priority]);
+            }
+            else {
+                pop_block[priority]++;
+            }
+        }
     }
     else {
-        popBloccati++;        
-    }
-    sem_post(&mutex);
-
-    sem_wait(&semPop);
-}
-
-void endPop () {
-    sem_wait(&mutex);
-    /* se ci sono inserimenti bloccati ne sblocco uno per primo per evitare la starvation delle PUSH, se non ci sono e invece ci sono estrazioni bloccate sblocco una di loro. */
-    if (pushBloccati > 0) {
-        pushBloccati--;
-        sem_post(&semPush);
-    } 
-    else if (popBloccati > 0) {
-        popBloccati--;
-        sem_post(&semPop);
-    }
-    sem_post(&mutex);
-}
-
-
-void push (int element) {
-    startPush();
-
-    sem_wait(&mutex);
-    sleep(2);
-    if ( numElementi[0] != dim ) { // se l'array non è pieno allora ...
-        tail[0] = (tail[0] + 1) % dim;
-        myArray[tail[0]] = element;
-        ++numElementi[0];
-        // controllo se aggiornare i valori delle variabili 'empty' e 'full'
-        if (numElementi[0] == dim) 
-            full = true;
-        else if ((numElementi[0] != 0) && (empty == true)){
-            empty = false;
+        if (type == FIFO) {
+            cout << "Non è possibile specificare il grado di priorità in una coda FIFO";
+            return -2;
         }
-        showArray();
-    }
-    sem_post(&mutex);
-
-    endPush();
-}
-
-
-int pop () {
-    startPop();
-    int result;
-    sem_wait(&mutex);
-    if (numElementi[0] != 0) {     // se la coda non è vuota allora ...
-        result = myArray[head[0]];
-        head[0] = (head[0] + 1) % dim;
-        --numElementi[0];
-        // controllo se aggiornare i valori delle variabili 'empty' e 'full'
-        if (numElementi[0] == 0) 
-            empty = true;
-        else if ((numElementi[0] != dim) && (full == true)){
-            full = false;
+        else {
+            //code multiple
+            if (!empty[priority]) {
+                sem_post(&sem_empty[priority]);
+            }
+            else {
+                pop_block[priority]++;
+            }
         }
-        showArray();
+    }
+    sem_post(&mutex);
+    sem_wait(&sem_empty[priority]);
+
+    sem_wait(&mutex);
+    int ret = myArray[priority][pop_next[priority]];
+    myArray[priority][pop_next[priority]] = -1;
+    pop_next[priority] = (pop_next[priority] + 1) % dim;
+    --tot[priority];        
+    if (pop_next[priority] == push_next[priority]) {
+        //Se dopo una pop i due puntatori coincidono, allora l'array è vuoto
+        empty[priority] = true;
+    }
+    else if(full[priority]){
+        full[priority] = false;
     }
     sem_post(&mutex);
 
-    endPop();
-    return result;
+    sem_wait(&mutex);
+    showArray();
+    if (push_block[priority] > 0 && !full[priority]) {
+        --push_block[priority];
+        sem_post(&sem_full[priority]);
+    }
+    else if (pop_block[priority] > 0 && !empty[priority]) {
+        --pop_block[priority];
+        sem_post(&sem_empty[priority]);
+    }
+    else{
+        //se non ce ne sono controllo negli altri livelli di priorità
+        for (int i=0; i<righe; i++) {
+            if (push_block[i] > 0 && !full[i]) {
+                --push_block[i];
+                sem_post(&sem_full[i]);
+            }
+            else if (pop_block[priority] > 0 && !empty[i]) {
+                --pop_block[priority];
+                sem_post(&sem_empty[i]);
+            }
+        }
+    }
+    sem_post(&mutex);
+    
+    return ret;
 }
+
+
+void push (int element, int priority) {
+
+    sem_wait(&mutex);
+    if(priority >= righe || priority < -1){
+        cout << "Impossibile eseguire la PUSH. Priorità specificata non valida." << endl;
+        return;
+    }
+    else if(element == NULL){
+        cout << "Si sta tentando di inserire un elemento NULL." << endl;
+        return;
+    }
+    if(priority == -1){
+        //Consideriamo la coda gestita come FIFO
+        if(type != FIFO){
+            cout << "Non è possibile inserire un elemento in una coda multipla senza specificare il livello di priorità." << endl;
+            sem_post(&mutex);
+            return;
+        }
+        ++priority; //Priorità 0.
+        if (!full[priority]) {
+            sem_post(&sem_full[priority]);
+        } 
+        else {
+            push_block++;
+        }
+    }
+    else {
+        //code multiple
+        if (!full[priority]) {
+            sem_post(&sem_full[priority]);
+        } 
+        else {
+            push_block++;
+        }
+    }
+    sem_post(&mutex);
+    sem_wait(&sem_full[priority]);
+
+    sem_wait(&mutex);
+    myArray[priority][push_next[priority]] = element;
+    push_next[priority] = (push_next[priority] + 1) % dim;
+    ++tot[priority];
+    if (pop_next[priority] == push_next[priority]) {
+        //Se dopo una push i due puntatori coincidono, allora l'array è pieno
+        full[priority] = true;
+    }
+    else if(empty[priority]){
+        empty[priority] = false;         
+    }
+    sem_post(&mutex);
+    
+    sem_wait(&mutex);
+    showArray();
+    if (pop_block[priority] > 0 && !empty[priority]) {
+        --pop_block[priority];
+        sem_post(&sem_empty[priority]);
+    }
+    else if (push_block[priority] > 0 && !full[priority]) {
+        --push_block[priority];
+        sem_post(&sem_full[priority]);
+    }
+    else{
+        //se non ce ne sono controllo negli altri livelli di priorità
+        for (int i=0; i<righe; i++) {
+            if (pop_block[i] > 0 && !empty[i]) {
+                --pop_block[i];
+                sem_post(&sem_empty[i]);
+            }
+            else if (push_block[priority] > 0 && !full[i]) {
+                --push_block[priority];
+                sem_post(&sem_full[i]);
+            }
+        }
+    }
+    sem_post(&mutex);
+}
+
+
 
 void showArray () {
     cout << "myArray = { ";
-    for (int i=0; i<dim; i++) {
-        if ((i+1)!=dim) {
-            cout << myArray[i] << ", ";
-        }
-        else {
-            cout << myArray[i] << " } ; \nhead[0]=" << head[0] << " ; tail[0]=" << tail[0] << " ; numElementi[0]=" << numElementi[0] << " ; empty=" << empty << " ; full=" << full << "\n\n";
+    for (int i=0; i<righe; i++) {
+        for (int j=0; j<colonne; j++) {
+            if ((j+1)!=colonne) {
+                cout << myArray[i][j] << ", ";
+            }
+            else {
+                if ((i+1)!=righe){
+                    cout << myArray[i][j] << " } ; --> pop_next=" << pop_next[i] << " ; push_next=" << push_next[i] << " ; tot=" << tot[i] << " ; empty=" << empty[i] << " ; full=" << full[i] << "\n          { ";
+                }
+                else {
+                    cout << myArray[i][j] << " } ; --> pop_next=" << pop_next[i] << " ; push_next=" << push_next[i] << " ; tot=" << tot[i] << " ; empty=" << empty[i] << " ; full=" << full[i] << " } ;\n";
+                }
+            }
         }
     }
 }
 
-/*----------------------------------------------------------------------*/
 
 void *routine (void *arg) {
 	int *pi = (int *)arg;
-	int j = 0;
-    cout << "iniziato il thread\n";
-    while (j < 4) {
-        push(j+10);
-        cout << "j=" << j << " --> ";
-        //showArray();
-        if ((j%3) == 0) {
-            int r = pop();
-            cout << "j=" << j << " --> la POP ha estratto il valore r=" << r << endl;
-        }
-        j++;
-    }
-    cout << "terminato il thread\n";
+    sleep(1);
+    int popOrPush = rand() % 2 + 1;
+    if (popOrPush ==2) {
+        //int r = rand() % righe;
+        cout << "iniziato il thread " << *pi << "-esimo (PUSH)\n";
 
+        //code MULTIPLE        
+        //push(*pi+10, r);
+
+        //coda FIFO
+        push(*pi+1,-1);
+    }
+    else if (popOrPush == 1) {
+        cout << "iniziato il thread " << *pi << "-esimo (POP)\n";
+
+        //code MULTIPLE
+        //int r = rand() % righe;
+        //int res = pop(1);
+
+        //coda FIFO
+        pop(-1);
+    }
+    /*sem_wait(&mutex);
+    showArray();
+    sem_post(&mutex);*/
+    cout << "terminato il thread\n";
 	pthread_exit((void *) pi);
 }
 
-int main(){
-	pthread_t *threads;
+int main (){
+
+    pthread_t *threads;
     int *taskKids;
     int *p;
-	int i;
-    dim = 10;
-    myArray = (int*)malloc(dim*sizeof(int));
-    head = (int*)malloc(1*sizeof(int));
-    tail = (int*)malloc(1*sizeof(int));
-    numElementi = (int*)malloc(1*sizeof(int));
-    head[0] = 0;
-    tail[0] = -1;
-    numElementi[0] = 0;
-    showArray();
-    int j = 0;
 
-	threads = (pthread_t *) malloc(3* sizeof(pthread_t));
-    taskKids = (int *) malloc(3 * sizeof(int));
+    //input righe
+    cout << "inserisci il numero di righe della matrice\n";
+    cin >> righe;
+    
+    if (righe == 1) {
+        type = FIFO;
+    }
+    else {
+        type = MULTIPLE;
+    }
+
+    //input colonne
+    cout << "inserisci il numero di colonne della matrice\n";
+    cin >> colonne;
+    dim = colonne;
+
+    // allocazione di un puntatore per ogni riga
+    myArray = new int*[righe];
+    // allocazione dell'array che contiene ogni riga
+    for (int i=0; i<righe; i++) {
+        myArray[i] = new int[colonne];
+    }
+
+    // elementi preimpostati a -1
+    for (int i=0; i<righe; i++) {
+        for (int j=0; j<colonne; j++) {
+            myArray[i][j] = -1;
+        }
+    }
+
+    pop_next = (int*)malloc(righe*sizeof(int));
+    push_next = (int*)malloc(righe*sizeof(int));
+    tot = (int*)malloc(righe*sizeof(int));
+    empty = (bool*)malloc(righe*sizeof(bool));
+    full = (bool*)malloc(righe*sizeof(bool));
+    push_block = (int*)malloc(righe*sizeof(int));
+    pop_block = (int*)malloc(righe*sizeof(int));
+
+    sem_empty = (sem_t*)malloc(righe*sizeof(sem_t));
+    sem_full = (sem_t*)malloc(righe*sizeof(sem_t*));
     sem_init(&mutex, 0, 1);
-    sem_init(&semPop, 0, 0);
-    sem_init(&semPush, 0, 0);
+    threads = (pthread_t *) malloc(THREADS* sizeof(pthread_t));
+    taskKids = (int *)malloc(THREADS * sizeof(int));
 
-	for(i=0;i<10;i++){
+    for(int i=0; i<righe; i++){
+        sem_init(&sem_empty[i], 0, 0);
+        sem_init(&sem_full[i], 0, 0);
+        pop_next[i] = 0;
+        push_next[i] = 0;
+        tot[i] = 0; 
+        empty[i] = true;
+        full[i] = false;   
+        push_block[i] = 0;
+        pop_block[i] = 0;
+    }
+
+    showArray();
+    
+    for (int i=0; i < THREADS; i++) {
         taskKids[i] = i;
 		pthread_create(&threads[i], NULL, routine, (void *) (&taskKids[i]));
 	}
 
-	for (i=0; i < 3; i++){
+	for (int i=0; i < THREADS; i++) {
         int ris;
         pthread_join(threads[i], (void**) & p);
         ris= *p;
         printf("MAIN: Pthread %d-esimo restituisce %d\n", i, ris);
     }
 
-    sleep(2);
+    // deallocazione delle singole righe
+    for (int i=0; i<righe; i++) {
+        delete[] myArray[i];
+    }
+    // deallocazione dei puntatori alle righe
+    delete[] myArray;   
+
     return 0;
 }
-
-
-
-
-
-
