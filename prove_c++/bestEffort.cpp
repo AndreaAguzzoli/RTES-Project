@@ -8,7 +8,7 @@ using namespace std;
 #ifndef FIFO
 #define FIFO 0
 #define MULTIPLE 1
-#define THREADS 200
+#define THREADS 10
 #endif
 
 
@@ -184,10 +184,10 @@ void *routine (void *arg) {
         cout << "iniziato il thread " << *pi << "-esimo (PUSH)\n";
         sleep(1);
         //code MULTIPLE        
-        //push(*pi+10, r);
+        push(*pi+10, r);
 
         //coda FIFO
-        push(*pi+1,-1);
+        //push(*pi+1,-1);
     }
     else if (popOrPush == 1) {
         cout << "iniziato il thread " << *pi << "-esimo (POP)\n";

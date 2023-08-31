@@ -840,18 +840,18 @@ static const char *__pyx_f[] = {
 };
 
 /*--- Type declarations ---*/
-struct __pyx_obj_4main_MyOperazioni;
+struct __pyx_obj_4main_MyInterface;
 
 /* "main.pyx":5
  * 
  * 
- * cdef class MyOperazioni:             # <<<<<<<<<<<<<<
- *     cdef cqueue.operazioni* op
+ * cdef class MyInterface:             # <<<<<<<<<<<<<<
+ *     cdef cqueue.Interface* op
  * 
  */
-struct __pyx_obj_4main_MyOperazioni {
+struct __pyx_obj_4main_MyInterface {
   PyObject_HEAD
-  operazioni *op;
+  Interface *op;
 };
 
 
@@ -1136,7 +1136,7 @@ static int __Pyx_InitStrings(__Pyx_StringTabEntry *t);
 /* Module declarations from 'cqueue' */
 
 /* Module declarations from 'main' */
-static PyTypeObject *__pyx_ptype_4main_MyOperazioni = 0;
+static PyTypeObject *__pyx_ptype_4main_MyInterface = 0;
 #define __Pyx_MODULE_NAME "main"
 extern int __pyx_module_is_main_main;
 int __pyx_module_is_main_main = 0;
@@ -1144,69 +1144,74 @@ int __pyx_module_is_main_main = 0;
 /* Implementation of 'main' */
 static PyObject *__pyx_builtin_MemoryError;
 static PyObject *__pyx_builtin_TypeError;
-static const char __pyx_k_a[] = "a";
-static const char __pyx_k_b[] = "b";
+static const char __pyx_k_c[] = "c";
+static const char __pyx_k_r[] = "r";
 static const char __pyx_k_main[] = "__main__";
 static const char __pyx_k_name[] = "__name__";
 static const char __pyx_k_test[] = "__test__";
+static const char __pyx_k_righe[] = "righe";
 static const char __pyx_k_reduce[] = "__reduce__";
+static const char __pyx_k_colonne[] = "colonne";
 static const char __pyx_k_getstate[] = "__getstate__";
 static const char __pyx_k_setstate[] = "__setstate__";
 static const char __pyx_k_TypeError[] = "TypeError";
 static const char __pyx_k_reduce_ex[] = "__reduce_ex__";
 static const char __pyx_k_MemoryError[] = "MemoryError";
-static const char __pyx_k_MyOperazioni[] = "MyOperazioni";
+static const char __pyx_k_MyInterface[] = "MyInterface";
 static const char __pyx_k_reduce_cython[] = "__reduce_cython__";
 static const char __pyx_k_setstate_cython[] = "__setstate_cython__";
 static const char __pyx_k_Not_enough_memory[] = "Not enough memory.";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_self_op_cannot_be_converted_to_a[] = "self.op cannot be converted to a Python object for pickling";
 static PyObject *__pyx_n_s_MemoryError;
-static PyObject *__pyx_n_s_MyOperazioni;
+static PyObject *__pyx_n_s_MyInterface;
 static PyObject *__pyx_kp_s_Not_enough_memory;
 static PyObject *__pyx_n_s_TypeError;
-static PyObject *__pyx_n_s_a;
-static PyObject *__pyx_n_s_b;
+static PyObject *__pyx_n_s_c;
 static PyObject *__pyx_n_s_cline_in_traceback;
+static PyObject *__pyx_n_s_colonne;
 static PyObject *__pyx_n_s_getstate;
 static PyObject *__pyx_n_s_main;
 static PyObject *__pyx_n_s_name;
+static PyObject *__pyx_n_s_r;
 static PyObject *__pyx_n_s_reduce;
 static PyObject *__pyx_n_s_reduce_cython;
 static PyObject *__pyx_n_s_reduce_ex;
+static PyObject *__pyx_n_s_righe;
 static PyObject *__pyx_kp_s_self_op_cannot_be_converted_to_a;
 static PyObject *__pyx_n_s_setstate;
 static PyObject *__pyx_n_s_setstate_cython;
 static PyObject *__pyx_n_s_test;
-static PyObject *__pyx_pf_4main_12MyOperazioni_somma(struct __pyx_obj_4main_MyOperazioni *__pyx_v_self, int __pyx_v_a, int __pyx_v_b); /* proto */
-static int __pyx_pf_4main_12MyOperazioni_2__init__(struct __pyx_obj_4main_MyOperazioni *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_4main_12MyOperazioni_4__del__(struct __pyx_obj_4main_MyOperazioni *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_4main_12MyOperazioni_6__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_4main_MyOperazioni *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_4main_12MyOperazioni_8__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_4main_MyOperazioni *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
-static PyObject *__pyx_tp_new_4main_MyOperazioni(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
+static PyObject *__pyx_pf_4main_11MyInterface_createMatrix(struct __pyx_obj_4main_MyInterface *__pyx_v_self, int __pyx_v_righe, int __pyx_v_colonne); /* proto */
+static PyObject *__pyx_pf_4main_11MyInterface_2MAIN(struct __pyx_obj_4main_MyInterface *__pyx_v_self, int __pyx_v_r, int __pyx_v_c); /* proto */
+static int __pyx_pf_4main_11MyInterface_4__init__(struct __pyx_obj_4main_MyInterface *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_4main_11MyInterface_6__del__(struct __pyx_obj_4main_MyInterface *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_4main_11MyInterface_8__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_4main_MyInterface *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_4main_11MyInterface_10__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_4main_MyInterface *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
+static PyObject *__pyx_tp_new_4main_MyInterface(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tuple_;
 static PyObject *__pyx_tuple__2;
 static PyObject *__pyx_tuple__3;
 /* Late includes */
 
-/* "main.pyx":10
- *     # if you want some vars you need --> def __init__(self, int some_var, char* some_string):
+/* "main.pyx":16
+ *     #    return self.op.stampaMatrice()
  * 
- *     def somma (self, int a, int b) :             # <<<<<<<<<<<<<<
- *         return self.op.somma(a,b)
+ *     def createMatrix (self, int righe, int colonne) :             # <<<<<<<<<<<<<<
+ *         return self.op.createMatrix(righe,colonne)
  * 
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4main_12MyOperazioni_1somma(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_4main_12MyOperazioni_1somma(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
-  int __pyx_v_a;
-  int __pyx_v_b;
+static PyObject *__pyx_pw_4main_11MyInterface_1createMatrix(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_4main_11MyInterface_1createMatrix(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  int __pyx_v_righe;
+  int __pyx_v_colonne;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("somma (wrapper)", 0);
+  __Pyx_RefNannySetupContext("createMatrix (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_a,&__pyx_n_s_b,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_righe,&__pyx_n_s_colonne,0};
     PyObject* values[2] = {0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
@@ -1222,17 +1227,17 @@ static PyObject *__pyx_pw_4main_12MyOperazioni_1somma(PyObject *__pyx_v_self, Py
       kw_args = PyDict_Size(__pyx_kwds);
       switch (pos_args) {
         case  0:
-        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_a)) != 0)) kw_args--;
+        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_righe)) != 0)) kw_args--;
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
-        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_b)) != 0)) kw_args--;
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_colonne)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("somma", 1, 2, 2, 1); __PYX_ERR(0, 10, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("createMatrix", 1, 2, 2, 1); __PYX_ERR(0, 16, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "somma") < 0)) __PYX_ERR(0, 10, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "createMatrix") < 0)) __PYX_ERR(0, 16, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -1240,56 +1245,56 @@ static PyObject *__pyx_pw_4main_12MyOperazioni_1somma(PyObject *__pyx_v_self, Py
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
-    __pyx_v_a = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_a == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 10, __pyx_L3_error)
-    __pyx_v_b = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_b == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 10, __pyx_L3_error)
+    __pyx_v_righe = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_righe == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 16, __pyx_L3_error)
+    __pyx_v_colonne = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_colonne == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 16, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("somma", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 10, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("createMatrix", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 16, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("main.MyOperazioni.somma", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("main.MyInterface.createMatrix", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4main_12MyOperazioni_somma(((struct __pyx_obj_4main_MyOperazioni *)__pyx_v_self), __pyx_v_a, __pyx_v_b);
+  __pyx_r = __pyx_pf_4main_11MyInterface_createMatrix(((struct __pyx_obj_4main_MyInterface *)__pyx_v_self), __pyx_v_righe, __pyx_v_colonne);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4main_12MyOperazioni_somma(struct __pyx_obj_4main_MyOperazioni *__pyx_v_self, int __pyx_v_a, int __pyx_v_b) {
+static PyObject *__pyx_pf_4main_11MyInterface_createMatrix(struct __pyx_obj_4main_MyInterface *__pyx_v_self, int __pyx_v_righe, int __pyx_v_colonne) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
-  __Pyx_RefNannySetupContext("somma", 0);
+  __Pyx_RefNannySetupContext("createMatrix", 0);
 
-  /* "main.pyx":11
+  /* "main.pyx":17
  * 
- *     def somma (self, int a, int b) :
- *         return self.op.somma(a,b)             # <<<<<<<<<<<<<<
+ *     def createMatrix (self, int righe, int colonne) :
+ *         return self.op.createMatrix(righe,colonne)             # <<<<<<<<<<<<<<
  * 
- *     def __init__(self):
+ *     def MAIN (self, int r, int c) :
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->op->somma(__pyx_v_a, __pyx_v_b)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 11, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->op->createMatrix(__pyx_v_righe, __pyx_v_colonne)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 17, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "main.pyx":10
- *     # if you want some vars you need --> def __init__(self, int some_var, char* some_string):
+  /* "main.pyx":16
+ *     #    return self.op.stampaMatrice()
  * 
- *     def somma (self, int a, int b) :             # <<<<<<<<<<<<<<
- *         return self.op.somma(a,b)
+ *     def createMatrix (self, int righe, int colonne) :             # <<<<<<<<<<<<<<
+ *         return self.op.createMatrix(righe,colonne)
  * 
  */
 
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("main.MyOperazioni.somma", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("main.MyInterface.createMatrix", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -1297,56 +1302,164 @@ static PyObject *__pyx_pf_4main_12MyOperazioni_somma(struct __pyx_obj_4main_MyOp
   return __pyx_r;
 }
 
-/* "main.pyx":13
- *         return self.op.somma(a,b)
+/* "main.pyx":19
+ *         return self.op.createMatrix(righe,colonne)
  * 
- *     def __init__(self):             # <<<<<<<<<<<<<<
- *         self.op = new cqueue.operazioni()
- *         if self.op == NULL:
+ *     def MAIN (self, int r, int c) :             # <<<<<<<<<<<<<<
+ *         return self.op.MAIN(r,c)
+ * 
  */
 
 /* Python wrapper */
-static int __pyx_pw_4main_12MyOperazioni_3__init__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static int __pyx_pw_4main_12MyOperazioni_3__init__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
-  int __pyx_r;
+static PyObject *__pyx_pw_4main_11MyInterface_3MAIN(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_4main_11MyInterface_3MAIN(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  int __pyx_v_r;
+  int __pyx_v_c;
+  PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("__init__ (wrapper)", 0);
-  if (unlikely(PyTuple_GET_SIZE(__pyx_args) > 0)) {
-    __Pyx_RaiseArgtupleInvalid("__init__", 1, 0, 0, PyTuple_GET_SIZE(__pyx_args)); return -1;}
-  if (unlikely(__pyx_kwds) && unlikely(PyDict_Size(__pyx_kwds) > 0) && unlikely(!__Pyx_CheckKeywordStrings(__pyx_kwds, "__init__", 0))) return -1;
-  __pyx_r = __pyx_pf_4main_12MyOperazioni_2__init__(((struct __pyx_obj_4main_MyOperazioni *)__pyx_v_self));
+  __Pyx_RefNannySetupContext("MAIN (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_r,&__pyx_n_s_c,0};
+    PyObject* values[2] = {0,0};
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        CYTHON_FALLTHROUGH;
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_r)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        CYTHON_FALLTHROUGH;
+        case  1:
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_c)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("MAIN", 1, 2, 2, 1); __PYX_ERR(0, 19, __pyx_L3_error)
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "MAIN") < 0)) __PYX_ERR(0, 19, __pyx_L3_error)
+      }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+    }
+    __pyx_v_r = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_r == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 19, __pyx_L3_error)
+    __pyx_v_c = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_c == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 19, __pyx_L3_error)
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("MAIN", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 19, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("main.MyInterface.MAIN", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_4main_11MyInterface_2MAIN(((struct __pyx_obj_4main_MyInterface *)__pyx_v_self), __pyx_v_r, __pyx_v_c);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static int __pyx_pf_4main_12MyOperazioni_2__init__(struct __pyx_obj_4main_MyOperazioni *__pyx_v_self) {
+static PyObject *__pyx_pf_4main_11MyInterface_2MAIN(struct __pyx_obj_4main_MyInterface *__pyx_v_self, int __pyx_v_r, int __pyx_v_c) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  __Pyx_RefNannySetupContext("MAIN", 0);
+
+  /* "main.pyx":20
+ * 
+ *     def MAIN (self, int r, int c) :
+ *         return self.op.MAIN(r,c)             # <<<<<<<<<<<<<<
+ * 
+ *     #def push (self, int element, int priority) :
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->op->MAIN(__pyx_v_r, __pyx_v_c)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 20, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* "main.pyx":19
+ *         return self.op.createMatrix(righe,colonne)
+ * 
+ *     def MAIN (self, int r, int c) :             # <<<<<<<<<<<<<<
+ *         return self.op.MAIN(r,c)
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("main.MyInterface.MAIN", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "main.pyx":28
+ * 
+ * 
+ *     def __init__(self):             # <<<<<<<<<<<<<<
+ *         self.op = new cqueue.Interface()
+ *         if self.op == NULL:
+ */
+
+/* Python wrapper */
+static int __pyx_pw_4main_11MyInterface_5__init__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static int __pyx_pw_4main_11MyInterface_5__init__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   int __pyx_r;
   __Pyx_RefNannyDeclarations
-  operazioni *__pyx_t_1;
+  __Pyx_RefNannySetupContext("__init__ (wrapper)", 0);
+  if (unlikely(PyTuple_GET_SIZE(__pyx_args) > 0)) {
+    __Pyx_RaiseArgtupleInvalid("__init__", 1, 0, 0, PyTuple_GET_SIZE(__pyx_args)); return -1;}
+  if (unlikely(__pyx_kwds) && unlikely(PyDict_Size(__pyx_kwds) > 0) && unlikely(!__Pyx_CheckKeywordStrings(__pyx_kwds, "__init__", 0))) return -1;
+  __pyx_r = __pyx_pf_4main_11MyInterface_4__init__(((struct __pyx_obj_4main_MyInterface *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_4main_11MyInterface_4__init__(struct __pyx_obj_4main_MyInterface *__pyx_v_self) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  Interface *__pyx_t_1;
   int __pyx_t_2;
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "main.pyx":14
+  /* "main.pyx":29
  * 
  *     def __init__(self):
- *         self.op = new cqueue.operazioni()             # <<<<<<<<<<<<<<
+ *         self.op = new cqueue.Interface()             # <<<<<<<<<<<<<<
  *         if self.op == NULL:
  *             raise MemoryError('Not enough memory.')
  */
   try {
-    __pyx_t_1 = new operazioni();
+    __pyx_t_1 = new Interface();
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 14, __pyx_L1_error)
+    __PYX_ERR(0, 29, __pyx_L1_error)
   }
   __pyx_v_self->op = __pyx_t_1;
 
-  /* "main.pyx":15
+  /* "main.pyx":30
  *     def __init__(self):
- *         self.op = new cqueue.operazioni()
+ *         self.op = new cqueue.Interface()
  *         if self.op == NULL:             # <<<<<<<<<<<<<<
  *             raise MemoryError('Not enough memory.')
  * 
@@ -1354,33 +1467,33 @@ static int __pyx_pf_4main_12MyOperazioni_2__init__(struct __pyx_obj_4main_MyOper
   __pyx_t_2 = ((__pyx_v_self->op == NULL) != 0);
   if (unlikely(__pyx_t_2)) {
 
-    /* "main.pyx":16
- *         self.op = new cqueue.operazioni()
+    /* "main.pyx":31
+ *         self.op = new cqueue.Interface()
  *         if self.op == NULL:
  *             raise MemoryError('Not enough memory.')             # <<<<<<<<<<<<<<
  * 
  *     def __del__(self):
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_MemoryError, __pyx_tuple_, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 16, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_MemoryError, __pyx_tuple_, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 31, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __PYX_ERR(0, 16, __pyx_L1_error)
+    __PYX_ERR(0, 31, __pyx_L1_error)
 
-    /* "main.pyx":15
+    /* "main.pyx":30
  *     def __init__(self):
- *         self.op = new cqueue.operazioni()
+ *         self.op = new cqueue.Interface()
  *         if self.op == NULL:             # <<<<<<<<<<<<<<
  *             raise MemoryError('Not enough memory.')
  * 
  */
   }
 
-  /* "main.pyx":13
- *         return self.op.somma(a,b)
+  /* "main.pyx":28
+ * 
  * 
  *     def __init__(self):             # <<<<<<<<<<<<<<
- *         self.op = new cqueue.operazioni()
+ *         self.op = new cqueue.Interface()
  *         if self.op == NULL:
  */
 
@@ -1389,14 +1502,14 @@ static int __pyx_pf_4main_12MyOperazioni_2__init__(struct __pyx_obj_4main_MyOper
   goto __pyx_L0;
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_AddTraceback("main.MyOperazioni.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("main.MyInterface.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = -1;
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "main.pyx":18
+/* "main.pyx":33
  *             raise MemoryError('Not enough memory.')
  * 
  *     def __del__(self):             # <<<<<<<<<<<<<<
@@ -1405,24 +1518,24 @@ static int __pyx_pf_4main_12MyOperazioni_2__init__(struct __pyx_obj_4main_MyOper
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4main_12MyOperazioni_5__del__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyObject *__pyx_pw_4main_12MyOperazioni_5__del__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_4main_11MyInterface_7__del__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_4main_11MyInterface_7__del__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__del__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_4main_12MyOperazioni_4__del__(((struct __pyx_obj_4main_MyOperazioni *)__pyx_v_self));
+  __pyx_r = __pyx_pf_4main_11MyInterface_6__del__(((struct __pyx_obj_4main_MyInterface *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4main_12MyOperazioni_4__del__(struct __pyx_obj_4main_MyOperazioni *__pyx_v_self) {
+static PyObject *__pyx_pf_4main_11MyInterface_6__del__(struct __pyx_obj_4main_MyInterface *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__del__", 0);
 
-  /* "main.pyx":19
+  /* "main.pyx":34
  * 
  *     def __del__(self):
  *         del self.op             # <<<<<<<<<<<<<<
@@ -1431,7 +1544,7 @@ static PyObject *__pyx_pf_4main_12MyOperazioni_4__del__(struct __pyx_obj_4main_M
  */
   delete __pyx_v_self->op;
 
-  /* "main.pyx":18
+  /* "main.pyx":33
  *             raise MemoryError('Not enough memory.')
  * 
  *     def __del__(self):             # <<<<<<<<<<<<<<
@@ -1453,19 +1566,19 @@ static PyObject *__pyx_pf_4main_12MyOperazioni_4__del__(struct __pyx_obj_4main_M
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4main_12MyOperazioni_7__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyObject *__pyx_pw_4main_12MyOperazioni_7__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_4main_11MyInterface_9__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_4main_11MyInterface_9__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__reduce_cython__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_4main_12MyOperazioni_6__reduce_cython__(((struct __pyx_obj_4main_MyOperazioni *)__pyx_v_self));
+  __pyx_r = __pyx_pf_4main_11MyInterface_8__reduce_cython__(((struct __pyx_obj_4main_MyInterface *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4main_12MyOperazioni_6__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_4main_MyOperazioni *__pyx_v_self) {
+static PyObject *__pyx_pf_4main_11MyInterface_8__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_4main_MyInterface *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -1492,7 +1605,7 @@ static PyObject *__pyx_pf_4main_12MyOperazioni_6__reduce_cython__(CYTHON_UNUSED 
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("main.MyOperazioni.__reduce_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("main.MyInterface.__reduce_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
@@ -1507,19 +1620,19 @@ static PyObject *__pyx_pf_4main_12MyOperazioni_6__reduce_cython__(CYTHON_UNUSED 
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4main_12MyOperazioni_9__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state); /*proto*/
-static PyObject *__pyx_pw_4main_12MyOperazioni_9__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pw_4main_11MyInterface_11__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state); /*proto*/
+static PyObject *__pyx_pw_4main_11MyInterface_11__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__setstate_cython__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_4main_12MyOperazioni_8__setstate_cython__(((struct __pyx_obj_4main_MyOperazioni *)__pyx_v_self), ((PyObject *)__pyx_v___pyx_state));
+  __pyx_r = __pyx_pf_4main_11MyInterface_10__setstate_cython__(((struct __pyx_obj_4main_MyInterface *)__pyx_v_self), ((PyObject *)__pyx_v___pyx_state));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4main_12MyOperazioni_8__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_4main_MyOperazioni *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pf_4main_11MyInterface_10__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_4main_MyInterface *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -1546,14 +1659,14 @@ static PyObject *__pyx_pf_4main_12MyOperazioni_8__setstate_cython__(CYTHON_UNUSE
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("main.MyOperazioni.__setstate_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("main.MyInterface.__setstate_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_tp_new_4main_MyOperazioni(PyTypeObject *t, CYTHON_UNUSED PyObject *a, CYTHON_UNUSED PyObject *k) {
+static PyObject *__pyx_tp_new_4main_MyInterface(PyTypeObject *t, CYTHON_UNUSED PyObject *a, CYTHON_UNUSED PyObject *k) {
   PyObject *o;
   if (likely((t->tp_flags & Py_TPFLAGS_IS_ABSTRACT) == 0)) {
     o = (*t->tp_alloc)(t, 0);
@@ -1564,7 +1677,7 @@ static PyObject *__pyx_tp_new_4main_MyOperazioni(PyTypeObject *t, CYTHON_UNUSED 
   return o;
 }
 
-static void __pyx_tp_dealloc_4main_MyOperazioni(PyObject *o) {
+static void __pyx_tp_dealloc_4main_MyInterface(PyObject *o) {
   #if CYTHON_USE_TP_FINALIZE
   if (unlikely(PyType_HasFeature(Py_TYPE(o), Py_TPFLAGS_HAVE_FINALIZE) && Py_TYPE(o)->tp_finalize) && (!PyType_IS_GC(Py_TYPE(o)) || !_PyGC_FINALIZED(o))) {
     if (PyObject_CallFinalizerFromDealloc(o)) return;
@@ -1573,20 +1686,21 @@ static void __pyx_tp_dealloc_4main_MyOperazioni(PyObject *o) {
   (*Py_TYPE(o)->tp_free)(o);
 }
 
-static PyMethodDef __pyx_methods_4main_MyOperazioni[] = {
-  {"somma", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_4main_12MyOperazioni_1somma, METH_VARARGS|METH_KEYWORDS, 0},
-  {"__del__", (PyCFunction)__pyx_pw_4main_12MyOperazioni_5__del__, METH_NOARGS, 0},
-  {"__reduce_cython__", (PyCFunction)__pyx_pw_4main_12MyOperazioni_7__reduce_cython__, METH_NOARGS, 0},
-  {"__setstate_cython__", (PyCFunction)__pyx_pw_4main_12MyOperazioni_9__setstate_cython__, METH_O, 0},
+static PyMethodDef __pyx_methods_4main_MyInterface[] = {
+  {"createMatrix", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_4main_11MyInterface_1createMatrix, METH_VARARGS|METH_KEYWORDS, 0},
+  {"MAIN", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_4main_11MyInterface_3MAIN, METH_VARARGS|METH_KEYWORDS, 0},
+  {"__del__", (PyCFunction)__pyx_pw_4main_11MyInterface_7__del__, METH_NOARGS, 0},
+  {"__reduce_cython__", (PyCFunction)__pyx_pw_4main_11MyInterface_9__reduce_cython__, METH_NOARGS, 0},
+  {"__setstate_cython__", (PyCFunction)__pyx_pw_4main_11MyInterface_11__setstate_cython__, METH_O, 0},
   {0, 0, 0, 0}
 };
 
-static PyTypeObject __pyx_type_4main_MyOperazioni = {
+static PyTypeObject __pyx_type_4main_MyInterface = {
   PyVarObject_HEAD_INIT(0, 0)
-  "main.MyOperazioni", /*tp_name*/
-  sizeof(struct __pyx_obj_4main_MyOperazioni), /*tp_basicsize*/
+  "main.MyInterface", /*tp_name*/
+  sizeof(struct __pyx_obj_4main_MyInterface), /*tp_basicsize*/
   0, /*tp_itemsize*/
-  __pyx_tp_dealloc_4main_MyOperazioni, /*tp_dealloc*/
+  __pyx_tp_dealloc_4main_MyInterface, /*tp_dealloc*/
   #if PY_VERSION_HEX < 0x030800b4
   0, /*tp_print*/
   #endif
@@ -1619,7 +1733,7 @@ static PyTypeObject __pyx_type_4main_MyOperazioni = {
   0, /*tp_weaklistoffset*/
   0, /*tp_iter*/
   0, /*tp_iternext*/
-  __pyx_methods_4main_MyOperazioni, /*tp_methods*/
+  __pyx_methods_4main_MyInterface, /*tp_methods*/
   0, /*tp_members*/
   0, /*tp_getset*/
   0, /*tp_base*/
@@ -1627,9 +1741,9 @@ static PyTypeObject __pyx_type_4main_MyOperazioni = {
   0, /*tp_descr_get*/
   0, /*tp_descr_set*/
   0, /*tp_dictoffset*/
-  __pyx_pw_4main_12MyOperazioni_3__init__, /*tp_init*/
+  __pyx_pw_4main_11MyInterface_5__init__, /*tp_init*/
   0, /*tp_alloc*/
-  __pyx_tp_new_4main_MyOperazioni, /*tp_new*/
+  __pyx_tp_new_4main_MyInterface, /*tp_new*/
   0, /*tp_free*/
   0, /*tp_is_gc*/
   0, /*tp_bases*/
@@ -1697,18 +1811,20 @@ static struct PyModuleDef __pyx_moduledef = {
 
 static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_MemoryError, __pyx_k_MemoryError, sizeof(__pyx_k_MemoryError), 0, 0, 1, 1},
-  {&__pyx_n_s_MyOperazioni, __pyx_k_MyOperazioni, sizeof(__pyx_k_MyOperazioni), 0, 0, 1, 1},
+  {&__pyx_n_s_MyInterface, __pyx_k_MyInterface, sizeof(__pyx_k_MyInterface), 0, 0, 1, 1},
   {&__pyx_kp_s_Not_enough_memory, __pyx_k_Not_enough_memory, sizeof(__pyx_k_Not_enough_memory), 0, 0, 1, 0},
   {&__pyx_n_s_TypeError, __pyx_k_TypeError, sizeof(__pyx_k_TypeError), 0, 0, 1, 1},
-  {&__pyx_n_s_a, __pyx_k_a, sizeof(__pyx_k_a), 0, 0, 1, 1},
-  {&__pyx_n_s_b, __pyx_k_b, sizeof(__pyx_k_b), 0, 0, 1, 1},
+  {&__pyx_n_s_c, __pyx_k_c, sizeof(__pyx_k_c), 0, 0, 1, 1},
   {&__pyx_n_s_cline_in_traceback, __pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 0, 1, 1},
+  {&__pyx_n_s_colonne, __pyx_k_colonne, sizeof(__pyx_k_colonne), 0, 0, 1, 1},
   {&__pyx_n_s_getstate, __pyx_k_getstate, sizeof(__pyx_k_getstate), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
   {&__pyx_n_s_name, __pyx_k_name, sizeof(__pyx_k_name), 0, 0, 1, 1},
+  {&__pyx_n_s_r, __pyx_k_r, sizeof(__pyx_k_r), 0, 0, 1, 1},
   {&__pyx_n_s_reduce, __pyx_k_reduce, sizeof(__pyx_k_reduce), 0, 0, 1, 1},
   {&__pyx_n_s_reduce_cython, __pyx_k_reduce_cython, sizeof(__pyx_k_reduce_cython), 0, 0, 1, 1},
   {&__pyx_n_s_reduce_ex, __pyx_k_reduce_ex, sizeof(__pyx_k_reduce_ex), 0, 0, 1, 1},
+  {&__pyx_n_s_righe, __pyx_k_righe, sizeof(__pyx_k_righe), 0, 0, 1, 1},
   {&__pyx_kp_s_self_op_cannot_be_converted_to_a, __pyx_k_self_op_cannot_be_converted_to_a, sizeof(__pyx_k_self_op_cannot_be_converted_to_a), 0, 0, 1, 0},
   {&__pyx_n_s_setstate, __pyx_k_setstate, sizeof(__pyx_k_setstate), 0, 0, 1, 1},
   {&__pyx_n_s_setstate_cython, __pyx_k_setstate_cython, sizeof(__pyx_k_setstate_cython), 0, 0, 1, 1},
@@ -1716,7 +1832,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_MemoryError = __Pyx_GetBuiltinName(__pyx_n_s_MemoryError); if (!__pyx_builtin_MemoryError) __PYX_ERR(0, 16, __pyx_L1_error)
+  __pyx_builtin_MemoryError = __Pyx_GetBuiltinName(__pyx_n_s_MemoryError); if (!__pyx_builtin_MemoryError) __PYX_ERR(0, 31, __pyx_L1_error)
   __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_n_s_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(1, 2, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
@@ -1727,14 +1843,14 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "main.pyx":16
- *         self.op = new cqueue.operazioni()
+  /* "main.pyx":31
+ *         self.op = new cqueue.Interface()
  *         if self.op == NULL:
  *             raise MemoryError('Not enough memory.')             # <<<<<<<<<<<<<<
  * 
  *     def __del__(self):
  */
-  __pyx_tuple_ = PyTuple_Pack(1, __pyx_kp_s_Not_enough_memory); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 16, __pyx_L1_error)
+  __pyx_tuple_ = PyTuple_Pack(1, __pyx_kp_s_Not_enough_memory); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 31, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple_);
   __Pyx_GIVEREF(__pyx_tuple_);
 
@@ -1806,16 +1922,16 @@ static int __Pyx_modinit_type_init_code(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_modinit_type_init_code", 0);
   /*--- Type init code ---*/
-  if (PyType_Ready(&__pyx_type_4main_MyOperazioni) < 0) __PYX_ERR(0, 5, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_4main_MyInterface) < 0) __PYX_ERR(0, 5, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
-  __pyx_type_4main_MyOperazioni.tp_print = 0;
+  __pyx_type_4main_MyInterface.tp_print = 0;
   #endif
-  if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_4main_MyOperazioni.tp_dictoffset && __pyx_type_4main_MyOperazioni.tp_getattro == PyObject_GenericGetAttr)) {
-    __pyx_type_4main_MyOperazioni.tp_getattro = __Pyx_PyObject_GenericGetAttr;
+  if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_4main_MyInterface.tp_dictoffset && __pyx_type_4main_MyInterface.tp_getattro == PyObject_GenericGetAttr)) {
+    __pyx_type_4main_MyInterface.tp_getattro = __Pyx_PyObject_GenericGetAttr;
   }
-  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_MyOperazioni, (PyObject *)&__pyx_type_4main_MyOperazioni) < 0) __PYX_ERR(0, 5, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_4main_MyOperazioni) < 0) __PYX_ERR(0, 5, __pyx_L1_error)
-  __pyx_ptype_4main_MyOperazioni = &__pyx_type_4main_MyOperazioni;
+  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_MyInterface, (PyObject *)&__pyx_type_4main_MyInterface) < 0) __PYX_ERR(0, 5, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_4main_MyInterface) < 0) __PYX_ERR(0, 5, __pyx_L1_error)
+  __pyx_ptype_4main_MyInterface = &__pyx_type_4main_MyInterface;
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;

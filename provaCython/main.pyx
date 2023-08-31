@@ -2,16 +2,31 @@
 cimport cqueue
 
 
-cdef class MyOperazioni:
-    cdef cqueue.operazioni* op
+cdef class MyInterface:
+    cdef cqueue.Interface* op
 
     # if you want some vars you need --> def __init__(self, int some_var, char* some_string):
 
-    def somma (self, int a, int b) : 
-        return self.op.somma(a,b)
+
+
+
+    #def stampaMatrice (self) :
+    #    return self.op.stampaMatrice()
+        
+    def createMatrix (self, int righe, int colonne) :
+        return self.op.createMatrix(righe,colonne)
+
+    def MAIN (self, int r, int c) :
+        return self.op.MAIN(r,c)
+
+    #def push (self, int element, int priority) :
+      #  return self.op.push(element, priority)
+
+
+
 
     def __init__(self):
-        self.op = new cqueue.operazioni()
+        self.op = new cqueue.Interface()
         if self.op == NULL:
             raise MemoryError('Not enough memory.')
 

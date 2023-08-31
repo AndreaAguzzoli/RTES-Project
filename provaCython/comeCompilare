@@ -1,3 +1,0 @@
-"per compilare" --> $python3 setup.py build_ext --inplace
-
-"per eseguire" --> $python3 main.py
