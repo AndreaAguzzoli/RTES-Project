@@ -151,8 +151,14 @@ void Queue<T>::setLevels(int newlevels){
         free(this->queue[i]);
     this->levels = newlevels;
 }
-template<calss T>::getLevels(){
+template<calss T>
+int Queue<T>::getLevels(){
     return this->levels;
+}
+
+template<class T>
+int Queue<T>::getType(){
+    return this->type;
 }
 
 
@@ -170,6 +176,7 @@ T Queue<T>::popReliability (int priority) {
     if (this->type == FIFO) {
         if (priority != -1) {
             cout << "Impossibile specificare il livello di priorità in una coda FIFO." << endl;
+            sem_post(&this->mutex);
             return NULL;
         }
         ++priority; //Priorità 0.
