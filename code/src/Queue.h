@@ -16,10 +16,10 @@ using namespace std;
 #define DYNAMIC_PRIORITY 2
 #endif
 #ifndef DIM
-#define DIM 100
+#define DIM 10
 #endif
 #ifndef THREADS
-#define THREADS 2000
+#define THREADS 10
 #endif
 
 template<class T>
@@ -46,6 +46,7 @@ class Queue{
         Queue(int type = FIFO, int levels = 1, size_t dim = DIM);
 
         Queue(size_t dim);
+        void showArray();
 
         void setLevels(int);
 

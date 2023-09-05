@@ -1,7 +1,14 @@
 #include<iostream>
 #include<stdlib.h>
+#include <unistd.h>
 #include"Queue.h"
 using namespace std;
+
+Queue<int> q(1,3,(size_t)DIM);
+
+int vabs (int i) {
+    return -i;
+}
 
 //Implementazione costruttori
 template<class T>
@@ -22,7 +29,7 @@ Queue<T>::Queue(int type, int levels, size_t dim){
         return;
     }
 
-    this->dim = dim;
+    this->dim = DIM;
     this->levels = levels;
     this->type = type;
 
@@ -48,7 +55,7 @@ Queue<T>::Queue(int type, int levels, size_t dim){
     
     this->sem_empty = (sem_t**)malloc(this->levels*sizeof(sem_t*));
     this->sem_full = (sem_t**)malloc(this->levels*sizeof(sem_t*));
-    sem_init(&this->mutex, 1);
+    sem_init(&this->mutex, 0, 1);
 
     this->push_block = (int*)malloc(this->levels*sizeof(int));
     this->pop_block = (int*)malloc(this->levels*sizeof(int));
@@ -88,8 +95,8 @@ Queue<T>::Queue(size_t dim){
     this->levels = 1;
     this->dim = dim;
 
-    this->queue = (T**)malloc(sizeof(T*));
-    this->queue[0] = (T*)malloc(this->dim*sizeof(T));
+    this->queue = new int*[1];
+    this->queue[0] = new int[this->dim];
 
     this->empty = (bool*)malloc(sizeof(bool));
     this->full = (bool*)malloc(sizeof(bool));
@@ -101,7 +108,7 @@ Queue<T>::Queue(size_t dim){
     
     this->sem_empty = (sem_t**)malloc(sizeof(sem_t*));
     this->sem_full = (sem_t**)malloc(sizeof(sem_t*));
-    sem_init(&this->mutex, 1);
+    sem_init(&this->mutex, 0, 1);
 
     this->push_block = (int*)malloc(sizeof(int));
     this->pop_block = (int*)malloc(sizeof(int));
@@ -151,15 +158,17 @@ void Queue<T>::setLevels(int newlevels){
         free(this->queue[i]);
     this->levels = newlevels;
 }
-template<calss T>
+
+template<class T>
 int Queue<T>::getLevels(){
     return this->levels;
 }
 
+/*
 template<class T>
 int Queue<T>::getType(){
     return this->type;
-}
+}*/
 
 
 template<class T>
@@ -191,6 +200,7 @@ T Queue<T>::popReliability (int priority) {
             //Ora è necessario bloccarsi in attesa che qualcuno inserica un valore all'interno della coda.
             do {
                 priority = 0;
+                cout << "thread(POP) si SOSPENDE per CODA VUOTA\n";
                 ++this->pop_block[priority];
                 // mi sospendo sul semaforo relativo al livello di priorità e correttamente in fila
                 sem_post(&this->mutex);
@@ -200,6 +210,7 @@ T Queue<T>::popReliability (int priority) {
                 while(priority < this->levels && this->empty[priority]) 
                     ++priority;
             } while (priority >= this->levels);
+            cout << "thread(POP) si RISVEGLIA\n";
         }
     }
 
@@ -207,15 +218,18 @@ T Queue<T>::popReliability (int priority) {
     if (this->empty[priority] && !flag) {
         //coda vuota
         do {
+            cout << "thread(POP) si SOSPENDE per CODA VUOTA\n";
             ++this->pop_block[priority];
             // mi sospendo sul semaforo relativo al livello di priorità e correttamente in fila
             sem_post(&this->mutex);
             sem_wait(&this->sem_empty[priority][this->pop_block[priority]-1]);
             sem_wait(&this->mutex);        
         } while (this->empty[priority]); //il do/while è presente per evitare che tra il suo risveglio e l'acquisizione del mutex la coda torni vuota
+        cout << "thread(POP) si RISVEGLIA\n";
     }
 
     T ret = this->queue[priority][this->pop_next[priority]];
+    this->queue[priority][this->pop_next[priority]] = -1;
     this->pop_next[priority] = (++this->pop_next[priority])%this->dim;
     --this->tot[priority];
         
@@ -228,17 +242,22 @@ T Queue<T>::popReliability (int priority) {
         this->full[priority] = false;
     }
 
+    cout << "POP --> ";
+    this->showArray();
+
     // per evitare la starvation delle PUSH cerco di risvegliare prima una PUSH se c'è, altrimenti sveglio una POP
     // controllo prima nei livelli più alti di priorità
     for (int i = 0; i < this->levels; i++) {
         if (this->push_block[i] > 0) {            
             --this->push_block[i];
+            cout << "Sto per risvegliare una PUSH, sem_full[" << i << "][" << this->push_block[i] << "]" << endl;
             sem_post(&this->sem_full[i][this->push_block[i]]);
             break;
         }
         else if (this->pop_block[i] > 0) {
             --this->pop_block[i];
-            sem_post(&this->sem_empty[i][this->pop_block[i]]);
+            cout << "Sto per risvegliare una POP, sem_empty[" << i << "][" << this->pop_block[i] << "]" << endl;
+            sem_post(&this->sem_empty[i][this->push_block[i]]);
             break;
         }
     }
@@ -275,10 +294,12 @@ void Queue<T>::pushReliability (T element, int priority) {
         // coda piena
         do {
             ++this->push_block[priority];
+            cout << "thread(PUSH) si SOSPENDE per CODA PIENA --> sem_full[" << priority << "][" << this->push_block[priority]-1 << "]" << endl;
             sem_post(&this->mutex);
             sem_wait(&this->sem_full[priority][this->push_block[priority]-1]);
             sem_wait(&this->mutex);            
         } while (this->full[priority]); //il do/while è presente per evitare che tra il suo risveglio e l'acquisizione del mutex la coda torni vuota
+        cout << "thread(PUSH) si RISVEGLIA\n";
     }
     
 
@@ -295,16 +316,20 @@ void Queue<T>::pushReliability (T element, int priority) {
         this->empty[priority] = false;         
     }
 
+    this->showArray();
+
     // per evitare la starvation delle POP cerco di risvegliare prima una POP se c'è, altrimenti sveglio una push
     // controllo prima nei livelli più alti di priorità
     for (int i = 0; i < this->levels; i++) {
         if (this->pop_block[i] > 0) {
             --this->pop_block[i];
+            cout << "Sto per risvegliare una POP, sem_empty[" << i << "][" << this->pop_block[i] << "]" << endl;
             sem_post(&this->sem_empty[i][this->pop_block[i]]);
             break;
         }
         else if (this->push_block[i] > 0) {
             --this->push_block[i];
+            cout << "Sto per risvegliare una PUSH, sem_full[" << i << "][" << this->push_block[i] << "]" << endl;
             sem_post(&this->sem_full[i][this->push_block[i]]);
             break;
         }
@@ -377,10 +402,10 @@ T Queue<T>::popBestEffort (int priority) {
 
 template<class T>
 void Queue<T>::pushBestEffort (T element, int priority) {
-    sem_wait(&this->mutex);
-    if(priority >= this->levels || priority < -1){
+    sem_wait(&this.mutex);
+    if(priority >= this.levels || priority < -1){
         cout << "Impossibile eseguire la PUSH. Priorità specificata non valida." << endl;
-        sem_post(&this->mutex);
+        sem_post(&this.mutex);
         return;
     }
     else if(element == NULL){
@@ -428,7 +453,74 @@ void Queue<T>::pushBestEffort (T element, int priority) {
     sem_post(&this->mutex);
 }
 
-int main(void){
-    Queue<int>  q, q2((size_t)150), q3(FIXED_PRIORITY, 12);
-    q3.setLevels(10);
+void *routine (void *arg) {
+    while(1){
+        cout << "iniziato il thread\n";
+        sleep(1);
+        int r = rand() % 10;
+
+        //CODA FIFO
+        
+        //if ((r%2)==0) 
+        //    q.pushReliability(rand()%100);
+        //else {
+        //    q.popReliability();
+        //}
+        
+
+        //CODE MULTIPLE
+        if ((r%2)!=0) 
+            q.pushReliability(rand()%100,rand()%q.getLevels());
+            
+        else
+            q.popReliability(rand()%q.getLevels());
+
+        cout << "terminato il thread\n";
+    }
+	pthread_exit(NULL);
+}
+
+template<class T>
+void Queue<T>::showArray () {
+    cout << "Queue = { ";
+    for (int i=0; i<this->levels; i++) {
+        for (int j=0; j<DIM; j++) {
+            if ((j+1)!=DIM) {
+                cout << this->queue[i][j] << ", ";
+            }
+            else {
+                if ((i+1)!=this->levels){
+                    cout << this->queue[i][j] << " } ; --> pop_next=" << this->pop_next[i] << " ; push_next=" << this->push_next[i] << " ; tot=" << this->tot[i] << " ; empty=" << this->empty[i] << " ; full=" << this->full[i] << " ; pop_block=" << this->pop_block[i] << " ; push_block="<< this->push_block[i] << "\n          { ";
+                }
+                else {
+                    cout << this->queue[i][j] << " } ; --> pop_next=" << this->pop_next[i] << " ; push_next=" << this->push_next[i] << " ; tot=" << this->tot[i] << " ; empty=" << this->empty[i] << " ; full=" << this->full[i] << " ; pop_block=" << this->pop_block[i] << " ; push_block="<< this->push_block[i] << " } ;\n";
+                }
+            }
+        }
+    }
+}
+
+int main (){
+
+    pthread_t *threads;
+    int *taskKids;
+    int *p;
+
+    threads = (pthread_t *) malloc(THREADS* sizeof(pthread_t));
+    taskKids = (int *)malloc(THREADS * sizeof(int));
+
+    q.showArray();
+
+    for (int i=0; i < THREADS; i++) {
+        taskKids[i] = i;
+		pthread_create(&threads[i], NULL, routine, (void *) (&taskKids[i]));
+	}    
+
+	for (int i=0; i < THREADS; i++) {
+        int ris;
+        pthread_join(threads[i], (void**) & p);
+        printf("MAIN: Pthread %d-esimo terminato.\n",i);
+    }
+
+    return 0;
 }
