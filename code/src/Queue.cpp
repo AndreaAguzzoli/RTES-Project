@@ -199,6 +199,10 @@ bool Queue<T>::generalEmpty(){
     return empty;
 }
 
+<<<<<<< HEAD
+=======
+//Strategia di sincronizzazione: paradigma PRODUCER/CONSUMER
+>>>>>>> 174e4fcb1849f16a8d24cb216c3763c26b5b048b
 template<class T>
 T Queue<T>::pop () {
     //Come prima cosa veririchiamo che la coda non sia vuota.
@@ -255,7 +259,10 @@ T Queue<T>::pop () {
     sem_post(&this->mutex);
     return ret;
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 174e4fcb1849f16a8d24cb216c3763c26b5b048b
 template<class T>
 void Queue<T>::push(T element, int priority) {
     if(priority >= this->levels || priority < -1){

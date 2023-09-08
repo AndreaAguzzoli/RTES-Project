@@ -9,7 +9,7 @@ op = main.MyInterface()
 #lst[0].append(op.divisione(6,4))
 #lst[0].append(op.modulo(3,4))
 
-w, h = 8, 2
+w, h = 8, 5
 #MyMatrix = [ [0 for x in range( w )] for y in range( h ) ]  
 
 r = op.MAIN(h,w)
