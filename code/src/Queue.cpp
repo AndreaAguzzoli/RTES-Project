@@ -179,15 +179,15 @@ void Queue<T>::show(){
             cout << this->queue[i][j] << ", ";
         }
         cout << "} " << "EMPTY= " << this->empty[i] << " FULL = " << this->full[i] << endl;
-        cout << "NEXT SPACE FOR PUSH: " << this->push_next[i] << endl;
-        cout << "NEXT ELEMENT FOR POP: " << this->pop_next[i] << endl;
-        cout << "------------------" << endl;
-        cout << "NEXT SPACE FOR PUSH WILL BLOCK: " << this->push_block[i] << endl;
-        cout << "NEXT PUSH WILL WAKEUP: " << this->push_wakeup[i] << endl;
-        cout << "------------------" << endl;
+        //cout << "NEXT SPACE FOR PUSH: " << this->push_next[i] << endl;
+        //cout << "NEXT ELEMENT FOR POP: " << this->pop_next[i] << endl;
+        //cout << "------------------" << endl;
+        //cout << "NEXT SPACE FOR PUSH WILL BLOCK: " << this->push_block[i] << endl;
+        //cout << "NEXT PUSH WILL WAKEUP: " << this->push_wakeup[i] << endl;
+        //cout << "------------------" << endl;
     }
-    cout << "NEXT SPACE FOR POP WILL BLOCK: " << this->pop_block << endl;
-    cout << "NEXT POP WILL WAKEUP: " << this->pop_wakeup << endl;
+    //cout << "NEXT SPACE FOR POP WILL BLOCK: " << this->pop_block << endl;
+    //cout << "NEXT POP WILL WAKEUP: " << this->pop_wakeup << endl;
     cout << "------------------" << endl;
     cout << "------------------" << endl;
 }
@@ -199,10 +199,7 @@ bool Queue<T>::generalEmpty(){
     return empty;
 }
 
-<<<<<<< HEAD
-=======
 //Strategia di sincronizzazione: paradigma PRODUCER/CONSUMER
->>>>>>> 174e4fcb1849f16a8d24cb216c3763c26b5b048b
 template<class T>
 T Queue<T>::pop () {
     //Come prima cosa veririchiamo che la coda non sia vuota.
@@ -232,6 +229,7 @@ T Queue<T>::pop () {
     
     //Ora preleviamo l'elemento
     T ret = this->queue[priority][this->pop_next[priority]];
+    this->queue[priority][this->pop_next[priority]] = -1;
     this->pop_next[priority] = (++this->pop_next[priority])%this->dim;
     --this->tot[priority];
         
@@ -259,10 +257,7 @@ T Queue<T>::pop () {
     sem_post(&this->mutex);
     return ret;
 }
-<<<<<<< HEAD
 
-=======
->>>>>>> 174e4fcb1849f16a8d24cb216c3763c26b5b048b
 template<class T>
 void Queue<T>::push(T element, int priority) {
     if(priority >= this->levels || priority < -1){

@@ -28,6 +28,29 @@ using namespace std;
 #define THREADS 1000
 #endif
 
+//Servono per utilizzare le macro anche nel modulo python
+int fifo(){
+    return FIFO;
+}
+int fixed_priority(){
+    return FIXED_PRIORITY;
+}
+int dynamic_priority(){
+    return DYNAMIC_PRIORITY;
+}
+int dim(){
+    return DIM;
+}
+int best_effort(){
+    return BEST_EFFORT;
+}
+int reliability(){
+    return RELIABILITY;
+}
+int threads(){
+    return THREADS;
+}
+
 template<class T>
 class Queue{
     public:

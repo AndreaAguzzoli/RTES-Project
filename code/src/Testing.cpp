@@ -1,10 +1,9 @@
 #include<iostream>
 #include<unistd.h>
-#include<pthread.h>
 #include<stdlib.h>
 #include"Queue.h"
 #include"Queue.cpp"
- Queue<int> q((size_t)60, RELIABILITY);
+ Queue<int> q(RELIABILITY, FIXED_PRIORITY, 5, 15);
 
 void* pop_routine(void* p){
     int id = *((int *) p);
@@ -23,7 +22,8 @@ void* push_routine(void* p){
     //cout << "THREAD " << id << " PUSHER STARTS FOR " << times << " TIMES!" << endl;
     while(times){
         int push = rand() % 50;
-        q.push(push);
+        int level = rand() % 5;
+        q.push(push, level);
         --times;
     }
     return &id;
@@ -50,7 +50,6 @@ int main(){
     for(int i=0; i<THREADS*2; ++i){
         int ret;
         pthread_join(threads[i], (void **) &p);
-        cout << "MAIN: THREAD " << i << " ENDED WITH NO FAULT." << endl << endl;
     }
 
     return 0;
