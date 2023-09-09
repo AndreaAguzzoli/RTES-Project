@@ -150,13 +150,15 @@ Queue<T>::Queue(size_t dim, int gest){
     for(int i=(this->levels-1); i>=newlevels; --i)
         free(this->queue[i]);
     this->levels = newlevels;
-}
-int Queue::getLevels(){
+}*/
+template<class T>
+int Queue<T>::getLevels(){
     return this->levels;
 }
-int Queue::getType(){
+template<class T>
+int Queue<T>::getType(){
     return this->type;
-}*/
+}
 
 template<class T>
 void Queue<T>::show(){
@@ -248,19 +250,9 @@ T Queue<T>::pop () {
 
 template<class T>
 void Queue<T>::push(T element, int priority) {
-    if(priority >= this->levels || priority < -1){
+    if(priority >= this->levels || priority < 0){
         cout << "Impossibile eseguire la PUSH. Priorità specificata non valida." << endl;
         return;
-    }
-
-    if(priority == -1){
-        //Consideriamo la coda gestita come FIFO
-        if(this->type != FIFO){
-            cout << "Non è possibile inserire un elemento in una coda multipla senza specificare il livello di priorità." << endl;
-            sem_post(&this->mutex);
-            return;
-        }
-        ++priority; //Priorità 0.
     }
 
     if(this->gest == RELIABILITY){

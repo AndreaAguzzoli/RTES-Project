@@ -73,13 +73,11 @@ class Queue{
      * Attenzione a castare l'input!
      * Queue<int> q(10); --> NO, viene chiamato il costruttore di default perché 10 viene considerato int.
      * Queue<int> q((size_t)10) --> SI
-     * **/
+     **/
 
-        Queue(int gest = BEST_EFFORT, int type = FIFO, int levels = 1, size_t dim = DIM);
+        Queue(int gest = RELIABILITY, int type = FIFO, int levels = 1, size_t dim = DIM);
 
-        Queue(size_t dim, int gest = BEST_EFFORT);
-
-        void setLevels(int);
+        Queue(size_t dim, int gest = RELIABILITY);
 
         int getLevels(); //Ritorna il numero di livelli della coda (che coincide con la priorità massima)
         int getType(); //Ritorna il tipo di coda
@@ -87,7 +85,7 @@ class Queue{
         T pop();/*
         Estrae il primo elemento della coda NON VUOTA di più alta priorità.
         */
-        void push(T element, int priority = -1);/*
+        void push(T element, int priority = 0);/*
         Inserisce l'elemento passato nella coda di priorità specificata (se a code multiple). Per utilizzare la push sulla coda FIFO, NON SPECIFICARE la priorità, oppure usare 0.
         */
 
