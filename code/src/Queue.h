@@ -25,7 +25,7 @@ using namespace std;
 #define DIM 100
 #endif
 #ifndef THREADS
-#define THREADS 1000
+#define THREADS 998
 #endif
 
 //Servono per utilizzare le macro anche nel modulo python
@@ -38,7 +38,7 @@ int fixed_priority(){
 int dynamic_priority(){
     return DYNAMIC_PRIORITY;
 }
-int dim(){
+size_t dim(){
     return DIM;
 }
 int best_effort(){
@@ -49,6 +49,9 @@ int reliability(){
 }
 int threads(){
     return THREADS;
+}
+size_t int_to_sizet(int num){
+    return (size_t)num;
 }
 
 template<class T>

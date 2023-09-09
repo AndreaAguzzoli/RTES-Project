@@ -3,24 +3,25 @@ import threading
 import random
 import array as arr
 
-q=qu.Queue(qu.reliability(), qu.fixed_priority(), 3, 10)
+q=qu.Queue(qu.reliability(), qu.fixed_priority(), 3, 20)
 
 def popper(id):
-    print("yes")
-    times = 20
+    times = 50
     while times:
         p = q.pop()
         times = times - 1
 
+    print("POPPER DONE")
+
 def pusher(id):
-    print("no")
-    times = 20
-    while times:
-        push = random.random()%50
-        level = random.random()%5
-        q.push(push, level)
+    times = 50
+    while 1:
+        push = random.randint(1,50)
+        level = random.randint(0,2)
+        q.push(push, levels)
         times = times - 1
-    print("no")
+
+    print("PUSHER DONE")
 
 i=0
 x=list()

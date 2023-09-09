@@ -1,0 +1,1 @@
+gcc Testing.cpp -pthread -lstdc++ -o Testing

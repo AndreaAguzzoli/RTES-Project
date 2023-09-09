@@ -19,8 +19,12 @@ Queue<T>::Queue(int gest, int type, int levels, size_t dim){
         cout << "Impossibile avere una coda con 0 o meno livelli di priorità." << endl;
         return;
     }
-    if(type<FIFO || type > DYNAMIC_PRIORITY){
-        cout << "Valore non valido per il parametro type." << endl;
+    if(levels==1 || type==FIFO){
+        cout << "Utilizzare l'altro costruttore per ottenere una coda FIFO." << endl;
+        return;
+    }
+    if(type<FIXED_PRIORITY || type > DYNAMIC_PRIORITY){
+        cout << "Valore non valido per il parametro type in riferimento alle code multiple." << endl;
         return;
     }
 
@@ -28,15 +32,6 @@ Queue<T>::Queue(int gest, int type, int levels, size_t dim){
     this->levels = levels;
     this->type = type;
     this->gest = gest;
-
-    if(this->type == FIFO && this->levels != 1){
-        cout << "Impossibile avere una coda di " << levels << " livelli se gestita FIFO." << endl;
-        return;
-    }
-    if(this->type != FIFO && this->levels == 1){
-        cout << "La coda deve avere type=FIFO avendo inserito un solo livello di priorità." << endl;
-        return;
-    }
 
     this->queue = (T**)malloc(this->levels*sizeof(T*));
 
@@ -117,29 +112,22 @@ Queue<T>::Queue(size_t dim, int gest){
     this->pop_block = -1; 
     this->pop_wakeup = -1;
 
-    for(int i=0; i<1; ++i){
-        this->sem_full[i] = (sem_t*)malloc((THREADS)*sizeof(sem_t));
-        this->empty[i] = true;
-        this->full[i] = false;
-        this->tot[i] = 0;
-        this->pop_next[i] = 0;
-        this->push_next[i] = 0;
-        this->push_block[i] = -1;
-        this->push_wakeup[i] = this->dim -1;
-
-        if(this->type == FIFO)
-            break;
+    this->sem_full[0] = (sem_t*)malloc((THREADS)*sizeof(sem_t));
+    this->empty[0] = true;
+    this->full[0] = false;
+    this->tot[0] = 0;
+    this->pop_next[0] = 0;
+    this->push_next[0] = 0;
+    this->push_block[0] = -1;
+    this->push_wakeup[0] = this->dim -1;
+     
+    for(int i=0; i<THREADS; ++i) {
+        if(i < this->dim)
+            sem_init(&this->sem_full[0][i], 0, 1);
+        else
+            sem_init(&this->sem_full[0][i], 0, 0);
+        sem_init(&this->sem_empty[i], 0, 0);
     }
-    for(int i=0; i<1; ++i){     
-        for(int j=0; j<THREADS; ++j) {
-            if(j < this->dim)
-                sem_init(&this->sem_full[i][j], 0, 1);
-            else
-                sem_init(&this->sem_full[i][j], 0, 0);
-        }
-    }
-    for(int i=0; i<THREADS; ++i)
-            sem_init(&this->sem_empty[i], 0, 0);
 }
 
 /*void Queue::setLevels(int newlevels){
