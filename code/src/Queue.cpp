@@ -23,7 +23,7 @@ Queue<T>::Queue(bool gest, int type, int levels, size_t dim){
         cout << "Utilizzare l'altro costruttore per ottenere una coda FIFO." << endl;
         return;
     }
-    if(type<FIXED_PRIORITY || type > DYNAMIC_PRIORITY){
+    if(type!=FIXED_PRIORITY){
         cout << "Valore non valido per il parametro type in riferimento alle code multiple." << endl;
         return;
     }
@@ -46,6 +46,8 @@ Queue<T>::Queue(bool gest, int type, int levels, size_t dim){
     this->sem_empty = (sem_t*)malloc(THREADS*sizeof(sem_t));
     this->sem_full = (sem_t**)malloc(this->levels*sizeof(sem_t*));
     sem_init(&this->mutex, 0, 1);
+    sem_init(&this->mutex_pushblock, 0, 1);
+    sem_init(&this->mutex_popblock, 0, 1);
 
     this->push_block = (int*)malloc(this->levels*sizeof(int));
     this->push_wakeup = (int*)malloc(this->levels*sizeof(int));
@@ -75,7 +77,7 @@ Queue<T>::Queue(bool gest, int type, int levels, size_t dim){
         }
     }
     for(int i=0; i<THREADS; ++i)
-            sem_init(&this->sem_empty[i], 0, 0);
+        sem_init(&this->sem_empty[i], 0, 0);
 }
 
 template<class T>
@@ -102,10 +104,12 @@ Queue<T>::Queue(size_t dim, bool gest){
     this->push_next = (int*)malloc(sizeof(int));
 
     this->tot = (int*)malloc(sizeof(int));
-    
+
     this->sem_empty = (sem_t*)malloc(THREADS*sizeof(sem_t));
     this->sem_full = (sem_t**)malloc(sizeof(sem_t*));
     sem_init(&this->mutex, 0, 1);
+    sem_init(&this->mutex_pushblock, 0, 1);
+    sem_init(&this->mutex_popblock, 0, 1);
 
     this->push_block = (int*)malloc(sizeof(int));
     this->push_wakeup = (int*)malloc(sizeof(int));
@@ -139,7 +143,6 @@ Queue<T>::~Queue(){
     delete this->tot;
     delete this->push_block;
     delete this->push_wakeup;
-    delete this->sem_empty;
 
     for(int i=0; i<this->levels; ++i){
         delete this->queue[i];
@@ -149,27 +152,6 @@ Queue<T>::~Queue(){
     delete this->sem_full;
 }
 
-/*void Queue::setLevels(int newlevels){
-    if(!empty){
-        cout << "Non è possibile modificare i livelli di priorità di una coda non vuota." << endl;
-        return;
-    }
-    if(newlevels <= 0){
-        cout << "Impossibile avere una coda con 0 o meno livelli di priorità." << endl;
-        return;
-    }
-    else if(this->type == FIFO){
-        cout << "Non è possibile modificare i livelli di priorità per una coda FIFO." << endl;
-        return;
-    }
-    else if(newlevels < 2){
-        cout << "Non è possibile avere una coda a priorità statica/dinamica con 1 solo livello di priorità." << endl;
-        return;
-    }
-    for(int i=(this->levels-1); i>=newlevels; --i)
-        free(this->queue[i]);
-    this->levels = newlevels;
-}*/
 template<class T>
 int Queue<T>::getLevels(){
     return this->levels;
@@ -178,34 +160,41 @@ template<class T>
 int Queue<T>::getType(){
     return this->type;
 }
+template<class T>
+size_t Queue<T>::getDim(){
+    return this->dim;
+}
+template<class T>
+string Queue<T>::getQoS(){
+    if(this->gest)
+        return "RELIABILITY";
+    else
+        return "BEST EFFORT";
+}
+template<class T>
+T** Queue<T>::getQueue(){
+    return this->queue;
+}
+template<class T>
+bool Queue<T>::isEmpty(){
+    bool empty = true;
+    for(int i=0; i<this->levels; ++i)
+        if(!this->empty[i]) empty = false;
+    return empty;
+}
 
 template<class T>
 void Queue<T>::show(){
-    cout << "SHOWING ALL..." << endl;
     for(int i=0; i<this->levels; ++i){
         cout << i << ":" << "{";
         for(int j=0; j<this->dim; ++j){
             cout << this->queue[i][j] << ", ";
         }
-        cout << "} " << "EMPTY= " << this->empty[i] << " FULL = " << this->full[i] << endl;
-        //cout << "NEXT SPACE FOR PUSH: " << this->push_next[i] << endl;
-        //cout << "NEXT ELEMENT FOR POP: " << this->pop_next[i] << endl;
-        //cout << "------------------" << endl;
-        //cout << "NEXT SPACE FOR PUSH WILL BLOCK: " << this->push_block[i] << endl;
-        //cout << "NEXT PUSH WILL WAKEUP: " << this->push_wakeup[i] << endl;
-        //cout << "------------------" << endl;
+        cout << "} " << "EMPTY = " << this->empty[i] << " FULL = " << this->full[i] << "| NEXT PUSH = " << this->push_next[i] << " NEXT POP = " << this->pop_next[i] << " | NEXT PUSH BLOCK = " << (this->push_block[i]+1)%THREADS << " NEXT PUSH WAKEUP = " << (this->push_wakeup[i]+1)%THREADS << endl;
     }
-    //cout << "NEXT SPACE FOR POP WILL BLOCK: " << this->pop_block << endl;
-    //cout << "NEXT POP WILL WAKEUP: " << this->pop_wakeup << endl;
+    cout << "NEXT POP BLOCK: " << (this->pop_block+1)%THREADS << " | NEXT POP WAKEUP: " << (this->pop_wakeup+1)%THREADS << endl;
     cout << "------------------" << endl;
     cout << "------------------" << endl;
-}
-template<class T>
-bool Queue<T>::generalEmpty(){
-    bool empty = true;
-    for(int i=0; i<this->levels; ++i)
-        if(!this->empty[i]) empty = false;
-    return empty;
 }
 
 //Strategia di sincronizzazione: paradigma PRODUCER/CONSUMER
@@ -213,15 +202,19 @@ template<class T>
 T Queue<T>::pop () {
     //Come prima cosa veririchiamo che la coda non sia vuota.
     if(this->gest){
-        this->pop_block = (++this->pop_block)%THREADS;
-        sem_wait(&this->sem_empty[this->pop_block]); //Per come è implementata la soluzione, se la coda è completamente vuota questa wait sarà bloccante.
+        sem_wait(&this->mutex_popblock);
+        this->pop_block = (this->pop_block+1)%THREADS;
+        int index = this->pop_block;
+        sem_post(&this->mutex_popblock);
+        //Le 4 istruzioni di cui sopra servono a prevenire una race condition molto particolare.
+        sem_wait(&this->sem_empty[index]); //Per come è implementata la soluzione, se la coda è completamente vuota questa wait sarà bloccante.
         //Se c'è qualcosa da prelevare allora proviamo a prendere il mutex
     }
     
     sem_wait(&this->mutex);
     if(!this->gest){
         //Controlliamo che la coda non sia vuota solo in modalità BEST EFFORT in quanto in modalità RELIABILITY è garantito dall'utilizzo della sincronizzazione.
-        if(generalEmpty()){
+        if(isEmpty()){
             cout << "Coda vuota!" << endl;
             sem_post(&this->mutex);
             return NULL;
@@ -254,7 +247,7 @@ T Queue<T>::pop () {
     }
 
     if(this->gest){
-        this->push_wakeup[priority] = (++this->push_wakeup[priority])%THREADS; //Aggiorniamo i contatori per il risveglio FIFO dei pusher prima di liberare il mutex per evitare RC.
+        this->push_wakeup[priority] = (this->push_wakeup[priority]+1)%THREADS; //Aggiorniamo i contatori per il risveglio FIFO dei pusher prima di liberare il mutex per evitare RC.
         //Intanto noi abbiamo prelevato un elemento dalla coda, quindi possiamo dare la possibilità ad un pusher di non sospendersi sul semaforo.
         sem_post(&this->sem_full[priority][this->push_wakeup[priority]]); //Se c'era un pusher bloccato lo sveglieremo, altriementi quando arriverà troverà il semaforo a 1.
     }
@@ -276,8 +269,12 @@ void Queue<T>::push(T element, int priority) {
 
     if(this->gest){
         //Come prima cosa verifichiamo che la coda non sia piena
-        this->push_block[priority] = (++this->push_block[priority])%THREADS;
-        sem_wait(&this->sem_full[priority][this->push_block[priority]]);
+        sem_wait(&this->mutex_pushblock);
+        this->push_block[priority] = (this->push_block[priority]+1)%THREADS;
+        int index = this->push_block[priority];
+        sem_post(&this->mutex_pushblock);
+        //Le 4 istruzioni di cui sopra servono a prevenire una race condition molto particolare.
+        sem_wait(&this->sem_full[priority][index]);
         //Se c'è uno spazio per inserire, allora prendiamo il mutex.
     }
 
@@ -311,9 +308,9 @@ void Queue<T>::push(T element, int priority) {
     }
 
     if(this->gest){
-        this->pop_wakeup = (++this->pop_wakeup)%THREADS; //Aggiorniamo i contatori per il risveglio FIFO dei popper prima di liberare il mutex per evitare RC.
+        this->pop_wakeup = (this->pop_wakeup+1)%THREADS;
         //Intanto noi abbiamo inserito un elemento nella coda, quindi possiamo dare la possibilità ad un popper di non sospendersi sul semaforo.
-        sem_post(&this->sem_empty[this->pop_wakeup]); //Se c'era un pusher bloccato lo sveglieremo, altrimenti quando arriverà troverà il semaforo a 1.
+        sem_post(&this->sem_empty[this->pop_wakeup]);
     }
     //Ora ci occupiamo di liberare opportunamente il mutex.
 

@@ -15,9 +15,6 @@ using namespace std;
 #ifndef RELIABILITY
 #define RELIABILITY true
 #endif
-#ifndef DYNAMIC_PRIORITY
-#define DYNAMIC_PRIORITY 2
-#endif
 #ifndef BEST_EFFORT
 #define BEST_EFFORT false
 #endif
@@ -34,9 +31,6 @@ int fifo(){
 }
 int fixed_priority(){
     return FIXED_PRIORITY;
-}
-int dynamic_priority(){
-    return DYNAMIC_PRIORITY;
 }
 size_t dim(){
     return DIM;
@@ -90,6 +84,12 @@ class Queue{
 
         int getLevels(); //Ritorna il numero di livelli della coda (che coincide con la priorità massima)
         int getType(); //Ritorna il tipo di coda
+        size_t getDim(); //Ritorna la dimensione delle code
+        string getQoS(); //Rtorna se la coda è in Reliability o Best Effort
+        T** getQueue(); //Ritorna il puntatore alla coda
+        bool isEmpty(); //Ritorna TRUE se tutti livelli di priorità sono completamente vuoti; FALSE altrimenti.
+        void show(); //Stampa le caratteristiche della coda ed il suo contenuto 
+
 
         T pop();/*
         Estrae il primo elemento della coda NON VUOTA di più alta priorità.
@@ -99,8 +99,6 @@ class Queue{
         */
 
     private:
-        void show();
-        bool generalEmpty(); //Ritorna TRUE se tutti livelli di priorità sono completamente vuoti; FALSE altrimenti.
 
         bool* empty;
         bool* full;/*
@@ -125,6 +123,8 @@ class Queue{
         int pop_block; //Indice del semaforo si cui si dovrà bloccare il thread.
         int pop_wakeup; //Indice del prossimo thread da svegliare.
         sem_t mutex; //Per accedere in maniera mutuamente esclusiva alla coda.
+        sem_t mutex_pushblock;
+        sem_t mutex_popblock;
         sem_t* sem_empty; //Semaforo su cui si blocca chi vuole leggere ma la coda è vuota.
         sem_t** sem_full; /*
         È una matrice perché i pushers si bloccano selettivamente su uno specifico livello di priorità. È questa matrice è l'unica soluzione che mi è venuta in mente per un risveglio

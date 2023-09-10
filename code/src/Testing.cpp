@@ -3,41 +3,43 @@
 #include<stdlib.h>
 #include"Queue.h"
 #include"Queue.cpp"
- Queue<int> q(DIM, RELIABILITY);
+ Queue<int> q(RELIABILITY, FIXED_PRIORITY, 3, 7);
 
 void* pop_routine(void* p){
     int id = *((int *) p);
-    int times = 20;
+    int times = 23;
     //cout << "THREAD " << id << " POPPER STARS FOR " << times << " TIMES!" << endl;
     while(times){
         int pop = q.pop();
         --times;
     }
+    cout << "POPPER DONE" << endl;
     return &id;
 }
 
 void* push_routine(void* p){
     int id = *((int *) p);
-    int times = 20;
+    int times = 23;
     //cout << "THREAD " << id << " PUSHER STARTS FOR " << times << " TIMES!" << endl;
     while(times){
         int push = rand() % 50;
-        int level = rand() % 5;
+        int level = rand() % 3;
         q.push(push, level);
         --times;
     }
+    cout << "PUSHER DONE" << endl;
     return &id;
 }
 
 int main(){
     pthread_t *threads;
-    int *p;
+    int **ret;
     int *taskids;
     
     threads = (pthread_t *) malloc(THREADS*sizeof(pthread_t));
     taskids = (int *)malloc(THREADS*sizeof(int));
 
-    srand(265);
+    srand(123);
 
     for(int i=0; i<THREADS; ++i){
         taskids[i] = i;
@@ -48,8 +50,7 @@ int main(){
     }
 
     for(int i=0; i<THREADS; ++i){
-        int ret;
-        pthread_join(threads[i], (void **) &p);
+        pthread_join(threads[i], (void **) &ret);
     }
 
     return 0;
