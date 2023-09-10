@@ -13,19 +13,19 @@ using namespace std;
 #define FIXED_PRIORITY 1
 #endif
 #ifndef RELIABILITY
-#define RELIABILITY 1
+#define RELIABILITY true
 #endif
 #ifndef DYNAMIC_PRIORITY
 #define DYNAMIC_PRIORITY 2
 #endif
 #ifndef BEST_EFFORT
-#define BEST_EFFORT 0
+#define BEST_EFFORT false
 #endif
 #ifndef DIM
 #define DIM 100
 #endif
 #ifndef THREADS
-#define THREADS 998
+#define THREADS 1000
 #endif
 
 //Servono per utilizzare le macro anche nel modulo python
@@ -59,25 +59,34 @@ class Queue{
     public:
     /**
      * I costruttori senza parametri o i cui parametri hanno tutti un valore di default specificato sono detti "DEFAULT o ZERO CONSTRUCTOR".
-     * Nel nostro caso il costruttore di default è Queue(int, int, size_t) in cui viene associato il valore di default ad i parametri non specificati.
+     * Nel nostro caso il costruttore di default è Queue(int, int, int, size_t) in cui viene associato il valore di default ad i parametri non specificati.
      * È fortemente dipendente dalla posizione nel senso che:
-     * Queue<int> q; --> Queue(FIFO, 1, DIM);
-     * Queue<int> q(1) --> Queue(1, 1, DIM);
-     * Queue<int> q(1, 5) --> Queue(1, 5, DIM);
-     * Queue<int> q(1, 5, 80) --> Queue(1, 5, 80);
+     * Queue<int> q; --> Queue(RELIABILITY, FIXED_PRIORITY, 3, DIM);
+     * Queue<int> q(BEST_EFFORT) --> Queue(BEST_EFFORT, FIXED_PRIORITY, 3, DIM);
+     * Queue<int> q(BEST_EFFORT, FIXED_PRIORITY) --> Queue(BEST_EFFORT, FIXED_PRIORITY, 3, DIM);
+     * Queue<int> q(BEST_EFFORT, FIXED_PRIORITY, 5) --> Queue(BEST_EFFORT, FIXED_PRIORITY, 5, DIM);
+     * Queue<int> q(BEST_EFFORT, FIXED_PRIORITY, 5, 30) --> Queue(BEST_EFFORT, FIXED_PRIORITY, 5, 30);
      * Non può essere specificato il parametro dim senza aver prima definito i due parametri che lo precedono.
      * 
-     * Spiegato ciò vieniamo al perché ho aggiunto il secondo costruttore. Se si vuole una coda di multipli livelli è intuititvo che il parametro levels vada
-     * specificato. L'unico caso in cui si può desiderare specificare il parametro dim senza gli altri due è quando si vuole una coda FIFO con una certa
-     * dimensione non di default. Quindi il secondo costruttore copre proprio questo caso: genera una coda FIFO della dimensione specificata come parametro.
+     * Mediante il primo costruttore è possibile solo inizializzare una coda a livelli multipli.
+     * Per ottenere una semplice coda FIFO è possibile utilizzare il secondo costruttore che si differenzia dal primo per il tipo del primo parametro.
      * Attenzione a castare l'input!
      * Queue<int> q(10); --> NO, viene chiamato il costruttore di default perché 10 viene considerato int.
      * Queue<int> q((size_t)10) --> SI
+     * 
+     * In particolare nel modulo Python i dati non sono tipizzati, motivo per cui abbiamo creato la funzione int_to_sizet che casta ogni int in size_t.
+     * Quindi su python si potrà utilizzare il secondo costruttore come segue:
+     * 
+     * import Queue_cpp as queue
+     * q = queue.Queue(queue.int_to_sizet(10), queue.reliability())
      **/
 
-        Queue(int gest = RELIABILITY, int type = FIFO, int levels = 1, size_t dim = DIM);
+        Queue(bool gest = RELIABILITY, int type = FIXED_PRIORITY, int levels = 3, size_t dim = DIM);
 
-        Queue(size_t dim, int gest = RELIABILITY);
+        Queue(size_t dim, bool gest = RELIABILITY);
+
+        //Definisco un distruttore per prevenire memory leak
+        ~Queue();
 
         int getLevels(); //Ritorna il numero di livelli della coda (che coincide con la priorità massima)
         int getType(); //Ritorna il tipo di coda

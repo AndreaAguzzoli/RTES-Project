@@ -7,7 +7,7 @@ using namespace std;
 
 //Implementazione costruttori
 template<class T>
-Queue<T>::Queue(int gest, int type, int levels, size_t dim){
+Queue<T>::Queue(bool gest, int type, int levels, size_t dim){
     cout << "type: " << type << endl;
     cout << "levels: " << levels << endl;
     cout << "dim: " << dim << endl;
@@ -79,7 +79,7 @@ Queue<T>::Queue(int gest, int type, int levels, size_t dim){
 }
 
 template<class T>
-Queue<T>::Queue(size_t dim, int gest){
+Queue<T>::Queue(size_t dim, bool gest){
     cout << "dim: " << dim << endl;
     cout << "gest: " << gest << endl;
     cout << "THREADS: " << THREADS << endl;
@@ -128,6 +128,25 @@ Queue<T>::Queue(size_t dim, int gest){
             sem_init(&this->sem_full[0][i], 0, 0);
         sem_init(&this->sem_empty[i], 0, 0);
     }
+}
+
+template<class T>
+Queue<T>::~Queue(){
+    delete this->empty;
+    delete this->full;
+    delete this->pop_next;
+    delete this->push_next;
+    delete this->tot;
+    delete this->push_block;
+    delete this->push_wakeup;
+    delete this->sem_empty;
+
+    for(int i=0; i<this->levels; ++i){
+        delete this->queue[i];
+        delete this->sem_full[i];
+    }
+    delete this->queue;
+    delete this->sem_full;
 }
 
 /*void Queue::setLevels(int newlevels){
@@ -193,16 +212,17 @@ bool Queue<T>::generalEmpty(){
 template<class T>
 T Queue<T>::pop () {
     //Come prima cosa veririchiamo che la coda non sia vuota.
-    if(this->gest == RELIABILITY){
+    if(this->gest){
         this->pop_block = (++this->pop_block)%THREADS;
         sem_wait(&this->sem_empty[this->pop_block]); //Per come è implementata la soluzione, se la coda è completamente vuota questa wait sarà bloccante.
         //Se c'è qualcosa da prelevare allora proviamo a prendere il mutex
     }
     
     sem_wait(&this->mutex);
-    if(this->gest == BEST_EFFORT){
+    if(!this->gest){
         //Controlliamo che la coda non sia vuota solo in modalità BEST EFFORT in quanto in modalità RELIABILITY è garantito dall'utilizzo della sincronizzazione.
         if(generalEmpty()){
+            cout << "Coda vuota!" << endl;
             sem_post(&this->mutex);
             return NULL;
         }
@@ -233,7 +253,7 @@ T Queue<T>::pop () {
         this->full[priority] = false;
     }
 
-    if(this->gest == RELIABILITY){
+    if(this->gest){
         this->push_wakeup[priority] = (++this->push_wakeup[priority])%THREADS; //Aggiorniamo i contatori per il risveglio FIFO dei pusher prima di liberare il mutex per evitare RC.
         //Intanto noi abbiamo prelevato un elemento dalla coda, quindi possiamo dare la possibilità ad un pusher di non sospendersi sul semaforo.
         sem_post(&this->sem_full[priority][this->push_wakeup[priority]]); //Se c'era un pusher bloccato lo sveglieremo, altriementi quando arriverà troverà il semaforo a 1.
@@ -247,7 +267,6 @@ T Queue<T>::pop () {
     sem_post(&this->mutex);
     return ret;
 }
-
 template<class T>
 void Queue<T>::push(T element, int priority) {
     if(priority >= this->levels || priority < 0){
@@ -255,7 +274,7 @@ void Queue<T>::push(T element, int priority) {
         return;
     }
 
-    if(this->gest == RELIABILITY){
+    if(this->gest){
         //Come prima cosa verifichiamo che la coda non sia piena
         this->push_block[priority] = (++this->push_block[priority])%THREADS;
         sem_wait(&this->sem_full[priority][this->push_block[priority]]);
@@ -263,9 +282,10 @@ void Queue<T>::push(T element, int priority) {
     }
 
     sem_wait(&this->mutex);
-    if(this->gest == BEST_EFFORT){
+    if(!this->gest){
         //Controlliamo che la coda non sia piena solo in modalità BEST EFFORT in quanto in modalità RELIABILITY è garantito dall'utilizzo della sincronizzazione.
         if(this->full[priority]){
+            cout << "Coda piena!" << endl;
             sem_post(&this->mutex);
             return;
         }
@@ -290,10 +310,10 @@ void Queue<T>::push(T element, int priority) {
         this->empty[priority] = false;         
     }
 
-    if(this->gest == RELIABILITY){
+    if(this->gest){
         this->pop_wakeup = (++this->pop_wakeup)%THREADS; //Aggiorniamo i contatori per il risveglio FIFO dei popper prima di liberare il mutex per evitare RC.
         //Intanto noi abbiamo inserito un elemento nella coda, quindi possiamo dare la possibilità ad un popper di non sospendersi sul semaforo.
-        sem_post(&this->sem_empty[this->pop_wakeup]); //Se c'era un pusher bloccato lo sveglieremo, altriementi quando arriverà troverà il semaforo a 1.
+        sem_post(&this->sem_empty[this->pop_wakeup]); //Se c'era un pusher bloccato lo sveglieremo, altrimenti quando arriverà troverà il semaforo a 1.
     }
     //Ora ci occupiamo di liberare opportunamente il mutex.
 
