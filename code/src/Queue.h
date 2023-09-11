@@ -106,7 +106,7 @@ class Queue{
         */
 
         int type;
-        int gest;
+        bool gest;
         int levels;
         T **queue;
         int dim;
@@ -123,7 +123,7 @@ class Queue{
         int pop_block; //Indice del semaforo si cui si dovrà bloccare il thread.
         int pop_wakeup; //Indice del prossimo thread da svegliare.
         sem_t mutex; //Per accedere in maniera mutuamente esclusiva alla coda.
-        sem_t mutex_pushblock;
+        sem_t mutex_pushblock; //Sono due semafori che servono a garantire mutua esclusione nell'accesso agli indici pop_block e push_block.
         sem_t mutex_popblock;
         sem_t* sem_empty; //Semaforo su cui si blocca chi vuole leggere ma la coda è vuota.
         sem_t** sem_full; /*

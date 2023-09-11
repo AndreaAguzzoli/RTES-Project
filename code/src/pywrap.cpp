@@ -4,7 +4,6 @@
 #include "Queue.cpp"
 
 namespace py = pybind11;
-constexpr auto byref = py::return_value_policy::reference_internal;
 
 PYBIND11_MODULE(Queue_cpp, m) {
     m.doc() = "Documentazione";

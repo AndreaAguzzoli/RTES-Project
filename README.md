@@ -1,32 +1,50 @@
-# QUEUE API
+# FIRST OF ALL...
+- Controllare la versione di sistema operativo.
 
-### Queue.h
+		$ lsb_release -d
 
-* **MACRO**:
-	* **FIFO**$\rightarrow$ macro di valore 0 utile per essere passata come parametro del costruttore.
-	* **FIXED_PRIORITY**$\rightarrow$ macro di valore 1 utile per essere passata come parametro del costruttore.
-	* **DYNAMIC_PRIORITY**$\rightarrow$ macro di valore 2 utile per essere passata come parametro del costruttore.
-	* **DIM**$\rightarrow$ macro di valore 100 utilizzata come dimensione di default all'interno dei costruttori.
-	* **THREADS**$\rightarrow$ macro di valore 2000 usata per stimare il numero massimo di thread che si possono bloccare contemporaneamente. Da modificare al bisogno.
-* **PARAMETRI**:
-	* **queue(T\*\*, private)**:$\rightarrow$ coda gestita come matrice. Ogni riga (riga 0, massima priorità) è implementata come buffer circolare ed elementi della stessa priorità sono gestiti FIFO.
-	* **type (int, private)**$\rightarrow$ identifica il tipo di coda (0=FIFO, 1=STATIC PRIORITY, 2=DYNAMIC PRIORITY, vedi macros).
-	* **levels (int, private)**$\rightarrow$ identifica il numero di livelli di priorità per le code multiple.
-	* **dim(int, private)**$\rightarrow$ identifica la dimensione della coda di ogni livello di priorità.
-	* **pop_next(int\*, private)**$\rightarrow$ pop_next[i] contiene l'indice dell'elemento da prelevare dalla coda di priorità i-esima. *(Il prelievo sarà: queue[i][pop_next[i])*
-	* **push_next(int\*, private)**$\rightarrow$ push_next[i] contiene l'indice del primo spazio libero della coda di priorità i-esima. *(l'inserimento sarà: queue[i][push_next[i])*
-	* **empty(bool\*, private**$\rightarrow$ empty[i] è TRUE se la coda di i-esima priorità è vuota.
-	* **full(bool\*, private**$\rightarrow$ full[i] è TRUE se la coda di i-esima priorità è piena.
-	* **tot(int\*, private**$\rightarrow$ tot[i] indica quanti elementi sono presenti all'interno della coda di i-esima priorità.
-	* **pop_block(int, private)**$\rightarrow$ indica quanti thread sono bloccati per effetto sospensivo di una POP.
-	* **push_block(int\*, private)**$\rightarrow$ push_block[i] indica quanti thread sono bloccati per effetto sospensivo di una PUSH sulla coda di i-esima priorità.
-	* **mutex(sem_t, private)**$\rightarrow$ semaforo per garantire l'accesso mutuamente esclusivo alla coda.
-	* **sem_empty(sem_t\*, private)**$\rightarrow$ semaforo su cui si bloccano i thread nel tentativo di fare una POP con coda vuota.
-	* **sem_full(sem_t\**, private)**$\rightarrow$ semaforo su cui si bloccano i thread nel tentativo di fare una POP con coda piena. Si tratta di una matrice per permettere il risveglio FIFO dei thread su ogni singolo livello di priorità.
-* **COSTRUTTORI**:
-	* **Queue(int type=FIFO, int levels=1, size_t dim=DIM)**$\rightarrow$ crea l'oggetto di tipo Queue. I valori di default portano alla creazione di una coda FIFO, mentre specificando i singoli parametri è possibile ottenere una gestione a code multiple.
-	* **Queue(int type, size\_t dim)**$\rightarrow$ crea l'oggetto di tipo Queue con gestione FIFO e dimensione specificata. *(Nota: se si passa come parametro la macro DIM si ottiene lo stesso risultato del costruttore precedente con i parametri di default)*
-* **METODI**
-	* **setLevels(int levels)**$\rightarrow$ cambia il numero di livelli per le code a priorità fisse o dinamiche. Se $new\\_levels\lt old\\_levels$ viene eliminata la coda di priorità più bassa a patto che questa sia vuota.
-	* **getType()**$\rightarrow$ ritorna il tipo di coda (0=FIFO, 1=STATIC PRIORITY, 2=DYNAMIC PRIORITY, vedi macros).
-	* **getLevels()**$\rightarrow$ ritorna il numero di livelli di priorità.
+- Le versioni di Ubuntu dalla 20.04, Python3 è già incluso. Per le versioni precedenti è raccomandato un upgrade.  
+Ora verifichiamo la presenza di aggiorniamenti.
+
+		$ sudo apt update
+	
+- Effettuiamo gli aggiornamenti.
+
+		$ sudo apt upgrade
+		
+- Ora installiamo pip per Python3.
+
+		$ sudo apt install python3-pip
+		
+- Ora utilizziamo il comando pip per installare pybind11, un modulo di python che ci permetterà di wrappare classi e funzioni C++ in moduli python.
+
+		$ pip install pybind11
+		
+Pybind11 è una libreria che permette appunto il wrapping di code C++ per Python e viceversa. La documentazione originale è possibile trovara [QUI](https://pybind11.readthedocs.io/en/stable/).  
+Una volta installato pybind11 sarà possibile compilare la libreria in modo tale da poterla importare in un codice Python. Per eseguire quello presente nel repository:
+
+- Spostarsi nella cartella contenente il codice.
+
+		$ cd PATH/TO/REPO/code/src
+		
+- Dare il seguente comando per effettuare il wrapping.
+
+		$ g++ -shared -fPIC -std=c++11 -I./pybind11/include/ `python3.8 -m pybind11 --includes` pywrap.cpp -o Queue_cpp.so `python3.8-config --ldflags`
+	
+- Se non si sono verificati errori, è possibile eseguire il codice python che importa la libreria.
+
+		$ python3 Python_Testing.py
+		
+Per eseguire il codice C++ che testa la libreria è sufficiente:
+
+- Spostarsi nella castella contenente il codice.
+
+		$ cd PATH/TO/REPO/code/src
+	
+- Compilare il codice (è presente un makefile).
+	
+		$ make
+	
+- Eseguire il codice.
+
+		$ ./Testing

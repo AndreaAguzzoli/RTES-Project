@@ -3,7 +3,7 @@
 #include<stdlib.h>
 #include"Queue.h"
 #include"Queue.cpp"
- Queue<int> q(RELIABILITY, FIXED_PRIORITY, 3, 7);
+ Queue<int> q(RELIABILITY, FIXED_PRIORITY, 3, 5);
 
 void* pop_routine(void* p){
     int id = *((int *) p);
