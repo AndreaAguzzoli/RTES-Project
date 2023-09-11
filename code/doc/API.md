@@ -3,30 +3,37 @@
 ### Queue.h
 
 * **MACRO**:
-	* **FIFO**$\rightarrow$ macro di valore 0 utile per essere passata come parametro del costruttore.
-	* **FIXED_PRIORITY**$\rightarrow$ macro di valore 1 utile per essere passata come parametro del costruttore.
-	* **DYNAMIC_PRIORITY**$\rightarrow$ macro di valore 2 utile per essere passata come parametro del costruttore.
+	* **BEST\_EFFORT**$\rightarrow$ macro di valore false utile per essere passata come parametro del costruttore.
+	* **RELIABILITY**$\rightarrow$ macro di valore true utile per essere passata come parametro del costruttore.
 	* **DIM**$\rightarrow$ macro di valore 100 utilizzata come dimensione di default all'interno dei costruttori.
-	* **THREADS**$\rightarrow$ macro di valore 2000 usata per stimare il numero massimo di thread che si possono bloccare contemporaneamente. Da modificare al bisogno.
+	* **THREADS**$\rightarrow$ macro di valore 1000 usata per stimare il numero massimo di thread che si possono bloccare contemporaneamente. Da modificare al bisogno.
 * **PARAMETRI**:
 	* **queue(T\*\*, private)**:$\rightarrow$ coda gestita come matrice. Ogni riga (riga 0, massima priorità) è implementata come buffer circolare ed elementi della stessa priorità sono gestiti FIFO.
-	* **type (int, private)**$\rightarrow$ identifica il tipo di coda (0=FIFO, 1=STATIC PRIORITY, 2=DYNAMIC PRIORITY, vedi macros).
-	* **levels (int, private)**$\rightarrow$ identifica il numero di livelli di priorità per le code multiple.
+	* **levels (int, private)**$\rightarrow$ identifica il numero di livelli di priorità.
 	* **dim(int, private)**$\rightarrow$ identifica la dimensione della coda di ogni livello di priorità.
-	* **pop_next(int\*, private)**$\rightarrow$ pop_next[i] contiene l'indice dell'elemento da prelevare dalla coda di priorità i-esima. *(Il prelievo sarà: queue[i][pop_next[i])*
-	* **push_next(int\*, private)**$\rightarrow$ push_next[i] contiene l'indice del primo spazio libero della coda di priorità i-esima. *(l'inserimento sarà: queue[i][push_next[i])*
+	* **reliability(bool, private)**$\rightarrow$ identifica se la coda deve lavorare in QoS reliability o best effort.
+	* **pop_next(int\*, private)**$\rightarrow$ pop\_next[i] contiene l'indice dell'elemento da prelevare dalla coda di priorità i-esima. *(Il prelievo sarà: queue[i][pop_next[i])*
+	* **push_next(int\*, private)**$\rightarrow$ push\_next[i] contiene l'indice del primo spazio libero della coda di priorità i-esima. *(l'inserimento sarà: queue[i][push_next[i])*
 	* **empty(bool\*, private**$\rightarrow$ empty[i] è TRUE se la coda di i-esima priorità è vuota.
 	* **full(bool\*, private**$\rightarrow$ full[i] è TRUE se la coda di i-esima priorità è piena.
 	* **tot(int\*, private**$\rightarrow$ tot[i] indica quanti elementi sono presenti all'interno della coda di i-esima priorità.
-	* **pop_block(int, private)**$\rightarrow$ indica quanti thread sono bloccati per effetto sospensivo di una POP.
-	* **push_block(int\*, private)**$\rightarrow$ push_block[i] indica quanti thread sono bloccati per effetto sospensivo di una PUSH sulla coda di i-esima priorità.
+	* **pop_block(int, private)**$\rightarrow$ contiene l'indice del semaforo su cui tentare la wait per una POP. *(Il controllo sarà: sem\_wait(&this->sem\_empty[this->pop\_block]))*
+	* **push_block(int\*, private)**$\rightarrow$ push\_block[i] contiene l'indice del semaforo su cui tentare la wait per l'i-esimo livello di priorità. *(Il controllo sarà: sem\_wait(&this->sem\_full[priority][this->push\_block[priority]]))*
+	* **pop_wakeup(int, private)**$\rightarrow$ contiene l'indice del prossimo thread da svegliare di quelli sospesi da una POP. *(il risveglio sarà: sem\_post(&this->sem\_empty[this->pop\_wakeup]))*
+	* **push_wakeup(int\*, private)**$\rightarrow$ push\_wakeup[i]contiene l'indice del prossimo thread da svegliare di quelli sospesi da una PUSH sull'i-esimo livello di priorità. *(il risveglio sarà: sem\_post(&this->sem\_full[priority][this->push\_wakeup[priority]]))*
 	* **mutex(sem_t, private)**$\rightarrow$ semaforo per garantire l'accesso mutuamente esclusivo alla coda.
-	* **sem_empty(sem_t\*, private)**$\rightarrow$ semaforo su cui si bloccano i thread nel tentativo di fare una POP con coda vuota.
-	* **sem_full(sem_t\**, private)**$\rightarrow$ semaforo su cui si bloccano i thread nel tentativo di fare una POP con coda piena. Si tratta di una matrice per permettere il risveglio FIFO dei thread su ogni singolo livello di priorità.
+	* **mutex_popblocl(sem_t, private)**$\rightarrow$ semaforo per garantire l'accesso mutuamente esclusivo alla variabile pop_block.
+	* **mutex_pushblock(sem_t, private)**$\rightarrow$ semaforo per garantire l'accesso mutuamente esclusivo all'arrai push_block.
+	* **sem_empty(sem_t\*, private)**$\rightarrow$ semafori su cui si bloccano i thread nel tentativo di fare una POP con coda vuota. Si tratta di un array per permettere il risveglio FIFO dei thread.
+	* **sem_full(sem_t\**, private)**$\rightarrow$ semafori su cui si bloccano i thread nel tentativo di fare una PUSH con coda piena. Si tratta di una matrice per permettere il risveglio FIFO dei thread su ogni singolo livello di priorità.
 * **COSTRUTTORI**:
-	* **Queue(int type=FIFO, int levels=1, size_t dim=DIM)**$\rightarrow$ crea l'oggetto di tipo Queue. I valori di default portano alla creazione di una coda FIFO, mentre specificando i singoli parametri è possibile ottenere una gestione a code multiple.
-	* **Queue(int type, size\_t dim)**$\rightarrow$ crea l'oggetto di tipo Queue con gestione FIFO e dimensione specificata. *(Nota: se si passa come parametro la macro DIM si ottiene lo stesso risultato del costruttore precedente con i parametri di default)*
+	* **Queue(bool reliability=RELIABILITY, int levels=3, size_t dim=DIM)**$\rightarrow$ Costruttore che di default genera delle CODE MULTIPLE su 3 livelli di priorità. Ogni livello di priorità è gestito FIFO ed ha dimensione DIM.
 * **METODI**
-	* **setLevels(int levels)**$\rightarrow$ cambia il numero di livelli per le code a priorità fisse o dinamiche. Se $new\\_levels\lt old\\_levels$ viene eliminata la coda di priorità più bassa a patto che questa sia vuota.
-	* **getType()**$\rightarrow$ ritorna il tipo di coda (0=FIFO, 1=STATIC PRIORITY, 2=DYNAMIC PRIORITY, vedi macros).
 	* **getLevels()**$\rightarrow$ ritorna il numero di livelli di priorità.
+	* **getDim()**$\rightarrow$ ritorna la dimensione dei livelli di priorità.
+	* **getQueue()**$\rightarrow$ ritorna il puntatore alla coda.
+	* **isReliability()**$\rightarrow$ ritorna TRUE se la coda è gestita in modo tale che rispetti la QoS Reliability; FALSE se Best Effort.
+	* **isEmpty()**$\rightarrow$ ritorna TRUE se tutti i livelli di priorità sono vuoti; FALSE altrimenti.
+	* **show()**$\rightarrow$ stampa su STDOUT lo stato della coda.
+	* **pop()**$\rightarrow$ ritorna il primo elemento disponibile nella coda di più alta priorità non vuota. L'esecuzione della pop è potenzialmente bloccante.
+	* **push(T element, int priority=0)**$\rightarrow$ inserisce l'elemento passato come parametro nella coda di priorità specificata (default priorità massima). L'esecuzione della push è potenzialmente bloccante.

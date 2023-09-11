@@ -7,10 +7,7 @@ using namespace std;
 
 //Implementazione costruttori
 template<class T>
-Queue<T>::Queue(bool gest, int type, int levels, size_t dim){
-    cout << "type: " << type << endl;
-    cout << "levels: " << levels << endl;
-    cout << "dim: " << dim << endl;
+Queue<T>::Queue(bool reliability, int levels, size_t dim){
     if(dim <= 0){
         cout << "Impossibile avere una coda di dimensione minore o uguale 0." << endl;
         return;
@@ -19,19 +16,14 @@ Queue<T>::Queue(bool gest, int type, int levels, size_t dim){
         cout << "Impossibile avere una coda con 0 o meno livelli di priorità." << endl;
         return;
     }
-    if(levels==1 || type==FIFO){
-        cout << "Utilizzare l'altro costruttore per ottenere una coda FIFO." << endl;
-        return;
-    }
-    if(type!=FIXED_PRIORITY){
-        cout << "Valore non valido per il parametro type in riferimento alle code multiple." << endl;
-        return;
-    }
+    //if(levels==1){
+    //    cout << "Utilizzare l'altro costruttore per ottenere una coda FIFO." << endl;
+    //   return;
+    //}
 
     this->dim = dim;
     this->levels = levels;
-    this->type = type;
-    this->gest = gest;
+    this->reliability = reliability;
 
     this->queue = (T**)malloc(this->levels*sizeof(T*));
 
@@ -63,12 +55,7 @@ Queue<T>::Queue(bool gest, int type, int levels, size_t dim){
         this->pop_next[i] = 0;
         this->push_next[i] = 0;
         this->push_block[i] = -1;
-        this->push_wakeup[i] = this->dim -1;
-
-        if(this->type == FIFO)
-            break;
-    }
-    for(int i=0; i<this->levels; ++i){     
+        this->push_wakeup[i] = this->dim -1;  
         for(int j=0; j<THREADS; ++j) {
             if(j < this->dim)
                 sem_init(&this->sem_full[i][j], 0, 1);
@@ -76,62 +63,9 @@ Queue<T>::Queue(bool gest, int type, int levels, size_t dim){
                 sem_init(&this->sem_full[i][j], 0, 0);
         }
     }
+
     for(int i=0; i<THREADS; ++i)
         sem_init(&this->sem_empty[i], 0, 0);
-}
-
-template<class T>
-Queue<T>::Queue(size_t dim, bool gest){
-    cout << "dim: " << dim << endl;
-    cout << "gest: " << gest << endl;
-    cout << "THREADS: " << THREADS << endl;
-    if(dim <= 0){
-        cout << "Impossibile avere una coda di dimensione minore o uguale 0." << endl;
-        return;
-    }
-    this->gest = gest;
-    this->type = FIFO;
-    this->levels = 1;
-    this->dim = dim;
-
-    this->queue = (T**)malloc(sizeof(T*));
-    this->queue[0] = (T*)malloc(this->dim*sizeof(T));
-
-    this->empty = (bool*)malloc(sizeof(bool));
-    this->full = (bool*)malloc(sizeof(bool));
-
-    this->pop_next = (int*)malloc(sizeof(int));
-    this->push_next = (int*)malloc(sizeof(int));
-
-    this->tot = (int*)malloc(sizeof(int));
-
-    this->sem_empty = (sem_t*)malloc(THREADS*sizeof(sem_t));
-    this->sem_full = (sem_t**)malloc(sizeof(sem_t*));
-    sem_init(&this->mutex, 0, 1);
-    sem_init(&this->mutex_pushblock, 0, 1);
-    sem_init(&this->mutex_popblock, 0, 1);
-
-    this->push_block = (int*)malloc(sizeof(int));
-    this->push_wakeup = (int*)malloc(sizeof(int));
-    this->pop_block = -1; 
-    this->pop_wakeup = -1;
-
-    this->sem_full[0] = (sem_t*)malloc((THREADS)*sizeof(sem_t));
-    this->empty[0] = true;
-    this->full[0] = false;
-    this->tot[0] = 0;
-    this->pop_next[0] = 0;
-    this->push_next[0] = 0;
-    this->push_block[0] = -1;
-    this->push_wakeup[0] = this->dim -1;
-     
-    for(int i=0; i<THREADS; ++i) {
-        if(i < this->dim)
-            sem_init(&this->sem_full[0][i], 0, 1);
-        else
-            sem_init(&this->sem_full[0][i], 0, 0);
-        sem_init(&this->sem_empty[i], 0, 0);
-    }
 }
 
 template<class T>
@@ -150,6 +84,7 @@ Queue<T>::~Queue(){
     }
     delete this->queue;
     delete this->sem_full;
+    delete this->sem_empty;
 }
 
 template<class T>
@@ -157,19 +92,12 @@ int Queue<T>::getLevels(){
     return this->levels;
 }
 template<class T>
-int Queue<T>::getType(){
-    return this->type;
-}
-template<class T>
 size_t Queue<T>::getDim(){
     return this->dim;
 }
 template<class T>
-string Queue<T>::getQoS(){
-    if(this->gest)
-        return "RELIABILITY";
-    else
-        return "BEST EFFORT";
+bool Queue<T>::isReliability(){
+    return this->reliability;
 }
 template<class T>
 T** Queue<T>::getQueue(){
@@ -201,7 +129,7 @@ void Queue<T>::show(){
 template<class T>
 T Queue<T>::pop () {
     //Come prima cosa veririchiamo che la coda non sia vuota.
-    if(this->gest){
+    if(this->reliability){
         sem_wait(&this->mutex_popblock);
         this->pop_block = (this->pop_block+1)%THREADS;
         int index = this->pop_block;
@@ -212,7 +140,7 @@ T Queue<T>::pop () {
     }
     
     sem_wait(&this->mutex);
-    if(!this->gest){
+    if(!this->reliability){
         //Controlliamo che la coda non sia vuota solo in modalità BEST EFFORT in quanto in modalità RELIABILITY è garantito dall'utilizzo della sincronizzazione.
         if(isEmpty()){
             cout << "Coda vuota!" << endl;
@@ -246,7 +174,7 @@ T Queue<T>::pop () {
         this->full[priority] = false;
     }
 
-    if(this->gest){
+    if(this->reliability){
         this->push_wakeup[priority] = (this->push_wakeup[priority]+1)%THREADS; //Aggiorniamo i contatori per il risveglio FIFO dei pusher prima di liberare il mutex per evitare RC.
         //Intanto noi abbiamo prelevato un elemento dalla coda, quindi possiamo dare la possibilità ad un pusher di non sospendersi sul semaforo.
         sem_post(&this->sem_full[priority][this->push_wakeup[priority]]); //Se c'era un pusher bloccato lo sveglieremo, altriementi quando arriverà troverà il semaforo a 1.
@@ -267,7 +195,7 @@ void Queue<T>::push(T element, int priority) {
         return;
     }
 
-    if(this->gest){
+    if(this->reliability){
         //Come prima cosa verifichiamo che la coda non sia piena
         sem_wait(&this->mutex_pushblock);
         this->push_block[priority] = (this->push_block[priority]+1)%THREADS;
@@ -279,7 +207,7 @@ void Queue<T>::push(T element, int priority) {
     }
 
     sem_wait(&this->mutex);
-    if(!this->gest){
+    if(!this->reliability){
         //Controlliamo che la coda non sia piena solo in modalità BEST EFFORT in quanto in modalità RELIABILITY è garantito dall'utilizzo della sincronizzazione.
         if(this->full[priority]){
             cout << "Coda piena!" << endl;
@@ -307,7 +235,7 @@ void Queue<T>::push(T element, int priority) {
         this->empty[priority] = false;         
     }
 
-    if(this->gest){
+    if(this->reliability){
         this->pop_wakeup = (this->pop_wakeup+1)%THREADS;
         //Intanto noi abbiamo inserito un elemento nella coda, quindi possiamo dare la possibilità ad un popper di non sospendersi sul semaforo.
         sem_post(&this->sem_empty[this->pop_wakeup]);

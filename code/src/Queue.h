@@ -6,12 +6,6 @@
 using namespace std;
 
 //Macro per identificare il tipo di gestione della coda
-#ifndef FIFO
-#define FIFO 0
-#endif
-#ifndef FIXED_PRIORITY
-#define FIXED_PRIORITY 1
-#endif
 #ifndef RELIABILITY
 #define RELIABILITY true
 #endif
@@ -26,12 +20,6 @@ using namespace std;
 #endif
 
 //Servono per utilizzare le macro anche nel modulo python
-int fifo(){
-    return FIFO;
-}
-int fixed_priority(){
-    return FIXED_PRIORITY;
-}
 size_t dim(){
     return DIM;
 }
@@ -53,40 +41,22 @@ class Queue{
     public:
     /**
      * I costruttori senza parametri o i cui parametri hanno tutti un valore di default specificato sono detti "DEFAULT o ZERO CONSTRUCTOR".
-     * Nel nostro caso il costruttore di default è Queue(int, int, int, size_t) in cui viene associato il valore di default ad i parametri non specificati.
+     * Nel nostro caso il costruttore di default è Queue(bool, int, size_t) in cui viene associato il valore di default ad i parametri non specificati.
      * È fortemente dipendente dalla posizione nel senso che:
-     * Queue<int> q; --> Queue(RELIABILITY, FIXED_PRIORITY, 3, DIM);
-     * Queue<int> q(BEST_EFFORT) --> Queue(BEST_EFFORT, FIXED_PRIORITY, 3, DIM);
-     * Queue<int> q(BEST_EFFORT, FIXED_PRIORITY) --> Queue(BEST_EFFORT, FIXED_PRIORITY, 3, DIM);
-     * Queue<int> q(BEST_EFFORT, FIXED_PRIORITY, 5) --> Queue(BEST_EFFORT, FIXED_PRIORITY, 5, DIM);
-     * Queue<int> q(BEST_EFFORT, FIXED_PRIORITY, 5, 30) --> Queue(BEST_EFFORT, FIXED_PRIORITY, 5, 30);
+     * Queue<int> q; --> Queue(RELIABILITY, 3, DIM);
+     * Queue<int> q(BEST_EFFORT) --> Queue(BEST_EFFORT, 3, DIM);
+     * Queue<int> q(BEST_EFFORT, 5) --> Queue(BEST_EFFORT, 5, DIM);
+     * Queue<int> q(BEST_EFFORT, 5, 30) --> Queue(BEST_EFFORT, 5, 30);
      * Non può essere specificato il parametro dim senza aver prima definito i due parametri che lo precedono.
-     * 
-     * Mediante il primo costruttore è possibile solo inizializzare una coda a livelli multipli.
-     * Per ottenere una semplice coda FIFO è possibile utilizzare il secondo costruttore che si differenzia dal primo per il tipo del primo parametro.
-     * Attenzione a castare l'input!
-     * Queue<int> q(10); --> NO, viene chiamato il costruttore di default perché 10 viene considerato int.
-     * Queue<int> q((size_t)10) --> SI
-     * 
-     * In particolare nel modulo Python i dati non sono tipizzati, motivo per cui abbiamo creato la funzione int_to_sizet che casta ogni int in size_t.
-     * Quindi su python si potrà utilizzare il secondo costruttore come segue:
-     * 
-     * import Queue_cpp as queue
-     * q = queue.Queue(queue.int_to_sizet(10), queue.reliability())
      **/
 
-        Queue(bool gest = RELIABILITY, int type = FIXED_PRIORITY, int levels = 3, size_t dim = DIM);
-
-        Queue(size_t dim, bool gest = RELIABILITY);
-
-        //Definisco un distruttore per prevenire memory leak
+        Queue(bool reliability = RELIABILITY, int levels = 3, size_t dim = DIM);
         ~Queue();
 
         int getLevels(); //Ritorna il numero di livelli della coda (che coincide con la priorità massima)
-        int getType(); //Ritorna il tipo di coda
         size_t getDim(); //Ritorna la dimensione delle code
-        string getQoS(); //Rtorna se la coda è in Reliability o Best Effort
         T** getQueue(); //Ritorna il puntatore alla coda
+        bool isReliability(); //Rtorna se la coda è in Reliability o Best Effort
         bool isEmpty(); //Ritorna TRUE se tutti livelli di priorità sono completamente vuoti; FALSE altrimenti.
         void show(); //Stampa le caratteristiche della coda ed il suo contenuto 
 
@@ -105,8 +75,7 @@ class Queue{
         EMPTY e FULL sono due array lunghi quanto il numero di livelli di priorità presenti. Ogni posizione indica se la coda del corrispondente livello di priorità è piena o vuota.
         */
 
-        int type;
-        bool gest;
+        bool reliability; //Tipo di gestione della coda
         int levels;
         T **queue;
         int dim;
@@ -125,7 +94,7 @@ class Queue{
         sem_t mutex; //Per accedere in maniera mutuamente esclusiva alla coda.
         sem_t mutex_pushblock; //Sono due semafori che servono a garantire mutua esclusione nell'accesso agli indici pop_block e push_block.
         sem_t mutex_popblock;
-        sem_t* sem_empty; //Semaforo su cui si blocca chi vuole leggere ma la coda è vuota.
+        sem_t* sem_empty; //Semaforo su cui si blocca chi vuole prelevare ma la coda è vuota.
         sem_t** sem_full; /*
         È una matrice perché i pushers si bloccano selettivamente su uno specifico livello di priorità. È questa matrice è l'unica soluzione che mi è venuta in mente per un risveglio
         selettivo sia in termini di livello di priorità che per mantenere l'ordine FIFO.

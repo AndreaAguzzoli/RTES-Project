@@ -3,7 +3,7 @@
 #include<stdlib.h>
 #include"Queue.h"
 #include"Queue.cpp"
- Queue<int> q(RELIABILITY, FIXED_PRIORITY, 3, 5);
+ Queue<int> q(RELIABILITY, 1, 4);
 
 void* pop_routine(void* p){
     int id = *((int *) p);
@@ -24,7 +24,7 @@ void* push_routine(void* p){
     while(times){
         int push = rand() % 50;
         int level = rand() % 3;
-        q.push(push, level);
+        q.push(push);
         --times;
     }
     cout << "PUSHER DONE" << endl;
@@ -39,7 +39,7 @@ int main(){
     threads = (pthread_t *) malloc(THREADS*sizeof(pthread_t));
     taskids = (int *)malloc(THREADS*sizeof(int));
 
-    srand(123);
+    srand(2387);
 
     for(int i=0; i<THREADS; ++i){
         taskids[i] = i;
