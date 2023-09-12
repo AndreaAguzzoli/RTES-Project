@@ -1,9 +1,9 @@
 #include<iostream>
 #include<stdlib.h>
 #include<unistd.h>
+#include<array>
 #include"Queue.h"
 using namespace std;
-#define NULL __null;
 
 //Implementazione costruttori
 template<class T>
@@ -16,10 +16,6 @@ Queue<T>::Queue(bool reliability, int levels, size_t dim){
         cout << "Impossibile avere una coda con 0 o meno livelli di priorità." << endl;
         return;
     }
-    //if(levels==1){
-    //    cout << "Utilizzare l'altro costruttore per ottenere una coda FIFO." << endl;
-    //   return;
-    //}
 
     this->dim = dim;
     this->levels = levels;
@@ -67,7 +63,6 @@ Queue<T>::Queue(bool reliability, int levels, size_t dim){
     for(int i=0; i<THREADS; ++i)
         sem_init(&this->sem_empty[i], 0, 0);
 }
-
 template<class T>
 Queue<T>::~Queue(){
     delete this->empty;
@@ -145,7 +140,7 @@ T Queue<T>::pop () {
         if(isEmpty()){
             cout << "Coda vuota!" << endl;
             sem_post(&this->mutex);
-            return NULL;
+            return __null;
         }
     }
 
@@ -160,7 +155,6 @@ T Queue<T>::pop () {
     
     //Ora preleviamo l'elemento
     T ret = this->queue[priority][this->pop_next[priority]];
-    this->queue[priority][this->pop_next[priority]] = -1;
     this->pop_next[priority] = (++this->pop_next[priority])%this->dim;
     --this->tot[priority];
         
@@ -194,7 +188,6 @@ void Queue<T>::push(T element, int priority) {
         cout << "Impossibile eseguire la PUSH. Priorità specificata non valida." << endl;
         return;
     }
-
     if(this->reliability){
         //Come prima cosa verifichiamo che la coda non sia piena
         sem_wait(&this->mutex_pushblock);

@@ -1,9 +1,9 @@
-import Queue_cpp as qu
+import Queue_cpp_int as qu
 import threading
 import random
 import array as arr
 
-q=qu.Queue(levels=1, dim=6)
+q=qu.Queue(levels=3, dim=6)
 
 def popper(id):
     times = 27
@@ -18,7 +18,7 @@ def pusher(id):
     while times:
         push = random.randint(1,50)
         level = random.randint(0,2)
-        q.push(push)
+        q.push(push, level)
         times = times - 1
 
     print("PUSHER DONE")

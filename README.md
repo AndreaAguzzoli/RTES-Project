@@ -27,13 +27,21 @@ Una volta installato pybind11 sarà possibile compilare la libreria in modo tale
 
 		cd PATH/TO/REPO/code/src
 		
-- Dare il seguente comando per effettuare il wrapping.
+- Dare il seguente comando per effettuare il wrapping della coda di interi.
 
-		g++ -shared -fPIC -std=c++11 -I./pybind11/include/ `python3.8 -m pybind11 --includes` pywrap.cpp -o Queue_cpp.so `python3.8-config --ldflags`
+		g++ -shared -fPIC -std=c++11 -I./pybind11/include/ `python3.8 -m pybind11 --includes` int_pywrap.cpp -o Queue_cpp_int.so `python3.8-config --ldflags`
 	
-- Se non si sono verificati errori, è possibile eseguire il codice python che importa la libreria.
+- Dare il seguente comando per effettuare il wrapping della coda di double.
 
-		python3 Python_Testing.py
+		g++ -shared -fPIC -std=c++11 -I./pybind11/include/ `python3.8 -m pybind11 --includes` double_pywrap.cpp -o Queue_cpp_double.so `python3.8-config --ldflags`
+
+- Se non si sono verificati errori, è possibile eseguire il codice python che importa la libreria sia con degli interi che con dei double.
+
+		python3 Python_int.py
+		
+	oppure:
+	
+		python3 Python_double.py
 		
 Per eseguire il codice C++ che testa la libreria è sufficiente:
 

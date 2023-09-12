@@ -3,6 +3,7 @@
 
 #include<pthread.h>
 #include<semaphore.h>
+
 using namespace std;
 
 //Macro per identificare il tipo di gestione della coda
