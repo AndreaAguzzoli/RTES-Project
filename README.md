@@ -23,17 +23,17 @@ Ora verifichiamo la presenza di aggiorniamenti.
 Pybind11 è una libreria che permette appunto il wrapping di code C++ per Python e viceversa. La documentazione originale è possibile trovara [QUI](https://pybind11.readthedocs.io/en/stable/).  
 Una volta installato pybind11 sarà possibile compilare la libreria in modo tale da poterla importare in un codice Python. Per eseguire quello presente nel repository:
 
-- Spostarsi nella cartella contenente il codice.
+- Spostarsi nella directory contenente il codice.
 
 		cd PATH/TO/REPO/code/src
 		
-- Dare il seguente comando per effettuare il wrapping della coda di interi.
+- Per compilare i wrapper python è sufficiente utilizzare il Makefile già presente all'interno della directory.
 
-		g++ -shared -fPIC -std=c++11 -I./pybind11/include/ `python3.8 -m pybind11 --includes` int_pywrap.cpp -o Queue_cpp_int.so `python3.8-config --ldflags`
+		make Queue\_cpp\_int.so
 	
-- Dare il seguente comando per effettuare il wrapping della coda di double.
-
-		g++ -shared -fPIC -std=c++11 -I./pybind11/include/ `python3.8 -m pybind11 --includes` double_pywrap.cpp -o Queue_cpp_double.so `python3.8-config --ldflags`
+	oppure:
+	
+		make Queue\_cpp\_double.so
 
 - Se non si sono verificati errori, è possibile eseguire il codice python che importa la libreria sia con degli interi che con dei double.
 
@@ -45,11 +45,11 @@ Una volta installato pybind11 sarà possibile compilare la libreria in modo tale
 		
 Per eseguire il codice C++ che testa la libreria è sufficiente:
 
-- Spostarsi nella castella contenente il codice.
+- Spostarsi nella directory contenente il codice.
 
 		cd PATH/TO/REPO/code/src
 	
-- Compilare il codice (è presente un makefile).
+- Compilare il codice utilizzando il Makefile già presente all'interno della directory.
 	
 		make
 	

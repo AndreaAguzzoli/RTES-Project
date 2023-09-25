@@ -5,6 +5,22 @@
 #include"Queue.h"
 using namespace std;
 
+size_t dim(){
+    return DIM;
+}
+int best_effort(){
+    return BEST_EFFORT;
+}
+int reliability(){
+    return RELIABILITY;
+}
+int threads(){
+    return THREADS;
+}
+size_t int_to_sizet(int num){
+    return (size_t)num;
+}
+
 //Implementazione costruttori
 template<class T>
 Queue<T>::Queue(bool reliability, int levels, size_t dim){
@@ -53,8 +69,10 @@ Queue<T>::Queue(bool reliability, int levels, size_t dim){
         this->push_block[i] = -1;
         this->push_wakeup[i] = this->dim -1;  
         for(int j=0; j<THREADS; ++j) {
-            if(j < this->dim)
+            if(j < this->dim){
                 sem_init(&this->sem_full[i][j], 0, 1);
+                this->queue[i][j] = -1; //Inizializziamo la cosa SOLO A SCOPO DIMOSTRATIVO siccome siamo certi del fatto che verranno utilizzati int e double.
+            }
             else
                 sem_init(&this->sem_full[i][j], 0, 0);
         }
@@ -155,6 +173,7 @@ T Queue<T>::pop () {
     
     //Ora preleviamo l'elemento
     T ret = this->queue[priority][this->pop_next[priority]];
+    this->queue[priority][this->pop_next[priority]] = -1;
     this->pop_next[priority] = (++this->pop_next[priority])%this->dim;
     --this->tot[priority];
         

@@ -21,21 +21,15 @@ using namespace std;
 #endif
 
 //Servono per utilizzare le macro anche nel modulo python
-size_t dim(){
-    return DIM;
-}
-int best_effort(){
-    return BEST_EFFORT;
-}
-int reliability(){
-    return RELIABILITY;
-}
-int threads(){
-    return THREADS;
-}
-size_t int_to_sizet(int num){
-    return (size_t)num;
-}
+extern size_t dim();
+extern int best_effort();
+extern int reliability();
+extern int threads();
+extern size_t int_to_sizet(int); /*
+                                Siccome Python non è un linguaggio tipizzato (il tipo delle variabili viene gestito trasparentemente), quando si necessita
+                                di differenziare size_t ed int non è possibile farlo. Questa funzione permette di effettuare il cast. Formalmente non sarebbe
+                                indispensabile in quanto size_t ed int sono due tipi "compatibili", quindi il cast esplicito non sarebbe necessario.
+                                */
 
 template<class T>
 class Queue{
@@ -63,18 +57,19 @@ class Queue{
 
 
         T pop();/*
-        Estrae il primo elemento della coda NON VUOTA di più alta priorità.
-        */
+                Estrae il primo elemento della coda NON VUOTA di più alta priorità.
+                */
         void push(T element, int priority = 0);/*
-        Inserisce l'elemento passato nella coda di priorità specificata (se a code multiple). Per utilizzare la push sulla coda FIFO, NON SPECIFICARE la priorità, oppure usare 0.
-        */
+                                                Inserisce l'elemento passato nella coda di priorità specificata (se a code multiple). Per utilizzare la push sulla coda FIFO, 
+                                                NON SPECIFICARE la priorità, oppure usare 0.
+                                                */
 
     private:
 
         bool* empty;
-        bool* full;/*
-        EMPTY e FULL sono due array lunghi quanto il numero di livelli di priorità presenti. Ogni posizione indica se la coda del corrispondente livello di priorità è piena o vuota.
-        */
+        bool* full; /*
+                    EMPTY e FULL sono due array lunghi quanto il numero di livelli di priorità presenti. Ogni posizione indica se la coda del corrispondente livello di priorità è piena o vuota.
+                    */
 
         bool reliability; //Tipo di gestione della coda
         int levels;
@@ -83,10 +78,10 @@ class Queue{
 
         int *pop_next; //Indici degli elementi per ogni livello di priorità da poppare
         int *push_next; //Indice del primo spazio libero per ogni livello di priorità; ovvero l'indice della posizione in cui eventualmente inserire un nuovo elemento.
-        int *tot; /*
-        Numero di elementi per ogni livello di priorità (utile per debugging, quindi lasciato anche agli utilizzatori). Si potrebbe utilizzare al posto di empty e full,
-        ma per coerenza alla letteratura si mantengono anche quelli.
-        */
+        int *tot;   /*
+                    Numero di elementi per ogni livello di priorità (utile per debugging, quindi lasciato anche agli utilizzatori). Si potrebbe utilizzare al posto di empty e full,
+                    ma per coerenza alla letteratura si mantengono anche quelli.
+                    */
 
         int* push_block; //Array che contiene in ogni posizione l'indice del semaforo su cui si dovrà bloccare il thread.
         int* push_wakeup; //Array che contiene in ogni posizione l'indice del prossimo thread da svegliare.
@@ -96,9 +91,10 @@ class Queue{
         sem_t mutex_pushblock; //Sono due semafori che servono a garantire mutua esclusione nell'accesso agli indici pop_block e push_block.
         sem_t mutex_popblock;
         sem_t* sem_empty; //Semaforo su cui si blocca chi vuole prelevare ma la coda è vuota.
-        sem_t** sem_full; /*
-        È una matrice perché i pushers si bloccano selettivamente su uno specifico livello di priorità. È questa matrice è l'unica soluzione che mi è venuta in mente per un risveglio
-        selettivo sia in termini di livello di priorità che per mantenere l'ordine FIFO.
-        */
+        sem_t** sem_full;   /*
+                            È una matrice perché i pushers si bloccano selettivamente su uno specifico livello di priorità; 
+                            questa matrice è l'unica soluzione che mi è venuta in mente per un risveglio
+                            selettivo sia in termini di livello di priorità che per mantenere l'ordine FIFO.
+                            */
 };
 #endif

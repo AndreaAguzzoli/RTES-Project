@@ -16,7 +16,6 @@ PYBIND11_MODULE(Queue_cpp_int, m) {
 
     py::class_<Queue<int>>(m, "Queue")
         .def(py::init<bool, int, size_t>(), py::arg("gest")=RELIABILITY, py::arg("levels")=3, py::arg("dim")=DIM) //Rendo accesibile il primo costruttore
-        //.def(py::init<size_t, bool>(), py::arg("dim")=DIM, py::arg("gest")=RELIABILITY) //Rendo accessible il secondo costruttore
         //Rendo visibili i getters
         .def("getLevels", &Queue<int>::getLevels)
         .def("getDim", &Queue<int>::getDim)

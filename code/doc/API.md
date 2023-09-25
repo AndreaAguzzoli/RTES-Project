@@ -22,8 +22,8 @@
 	* **pop_wakeup(int, private)**$\rightarrow$ contiene l'indice del prossimo thread da svegliare di quelli sospesi da una POP. *(il risveglio sarà: sem\_post(&this->sem\_empty[this->pop\_wakeup]))*
 	* **push_wakeup(int\*, private)**$\rightarrow$ push\_wakeup[i]contiene l'indice del prossimo thread da svegliare di quelli sospesi da una PUSH sull'i-esimo livello di priorità. *(il risveglio sarà: sem\_post(&this->sem\_full[priority][this->push\_wakeup[priority]]))*
 	* **mutex(sem_t, private)**$\rightarrow$ semaforo per garantire l'accesso mutuamente esclusivo alla coda.
-	* **mutex_popblocl(sem_t, private)**$\rightarrow$ semaforo per garantire l'accesso mutuamente esclusivo alla variabile pop_block.
-	* **mutex_pushblock(sem_t, private)**$\rightarrow$ semaforo per garantire l'accesso mutuamente esclusivo all'arrai push_block.
+	* **mutex_popblock(sem_t, private)**$\rightarrow$ semaforo per garantire l'accesso mutuamente esclusivo alla variabile pop_block.
+	* **mutex_pushblock(sem_t, private)**$\rightarrow$ semaforo per garantire l'accesso mutuamente esclusivo all'array push_block.
 	* **sem_empty(sem_t\*, private)**$\rightarrow$ semafori su cui si bloccano i thread nel tentativo di fare una POP con coda vuota. Si tratta di un array per permettere il risveglio FIFO dei thread.
 	* **sem_full(sem_t\**, private)**$\rightarrow$ semafori su cui si bloccano i thread nel tentativo di fare una PUSH con coda piena. Si tratta di una matrice per permettere il risveglio FIFO dei thread su ogni singolo livello di priorità.
 * **COSTRUTTORI**:
@@ -37,3 +37,9 @@
 	* **show()**$\rightarrow$ stampa su STDOUT lo stato della coda.
 	* **pop()**$\rightarrow$ ritorna il primo elemento disponibile nella coda di più alta priorità non vuota. L'esecuzione della pop è potenzialmente bloccante.
 	* **push(T element, int priority=0)**$\rightarrow$ inserisce l'elemento passato come parametro nella coda di priorità specificata (default priorità massima). L'esecuzione della push è potenzialmente bloccante.
+* **FUNZIONI**
+	* **dim()**$\rightarrow$ ritorna la macro DIM.
+	* **best_effort()**$\rightarrow$ ritorna la macro BEST_EFFORT.
+	* **reliability()**$\rightarrow$ ritorna la macro RELIABILITY.
+	* **threads()**$\rightarrow$ ritorna la macro THREADS.
+	* **int\_to\_sizet()**$\rightarrow$ ritorna l'int passato come parametro castato in size\_t.

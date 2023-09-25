@@ -5,14 +5,14 @@
 #include"Queue.h"
 #include"Queue.cpp"
 
-Queue<string> q(RELIABILITY, 1, 8);
+Queue<int> q(RELIABILITY, 2, 8);
 
 void* pop_routine(void* p){
     int id = *((int *) p);
     int times = 23;
     //cout << "THREAD " << id << " POPPER STARS FOR " << times << " TIMES!" << endl;
     while(times){
-        string pop = q.pop();
+        int pop = q.pop();
         --times;
     }
     cout << "POPPER DONE" << endl;
@@ -24,9 +24,9 @@ void* push_routine(void* p){
     int times = 23;
     //cout << "THREAD " << id << " PUSHER STARTS FOR " << times << " TIMES!" << endl;
     while(times){
-        string push = to_string(rand() % 26);
-        int level = rand() % 3;
-        q.push(push+"ciao");
+        int push = rand() % 150;
+        int level = rand() % 2;
+        q.push(push, level);
         --times;
     }
     cout << "PUSHER DONE" << endl;
