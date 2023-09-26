@@ -29,11 +29,11 @@ Una volta installato pybind11 sarà possibile compilare la libreria in modo tale
 		
 - Per compilare i wrapper python è sufficiente utilizzare il Makefile già presente all'interno della directory.
 
-		make Queue\_cpp\_int.so
+		make Queue_cpp_int.so
 	
 	oppure:
 	
-		make Queue\_cpp\_double.so
+		make Queue_cpp_double.so
 
 - Se non si sono verificati errori, è possibile eseguire il codice python che importa la libreria sia con degli interi che con dei double.
 

@@ -3,8 +3,9 @@
 #include<string>
 #include<stdlib.h>
 #include"Queue.h"
-#include"Queue.cpp"
+#include"Queue.cpp" 
 
+using namespace std;
 Queue<int> q(RELIABILITY, 2, 8);
 
 void* pop_routine(void* p){
