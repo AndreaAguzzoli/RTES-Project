@@ -17,7 +17,7 @@ def pusher(id):
     times = 27
     while times:
         push = random.randint(1,50)
-        level = random.randint(0,2)
+        level = random.randint(0,q.getLevels()-1)
         q.push(push, level)
         times = times - 1
 

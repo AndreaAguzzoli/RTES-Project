@@ -197,7 +197,7 @@ T Queue<T>::pop () {
     show();
     cout << endl << endl;
 
-    sem_post(&this->mutex);
+    sem_post(&this->mutex); //Le post su sem_full e mutex sono invertite solo per rendere leggibili le stampe di debug!!!!
     return ret;
 }
 template<class T>
@@ -257,6 +257,6 @@ void Queue<T>::push(T element, int priority) {
     show();
     cout << endl << endl;
 
-    sem_post(&this->mutex);
+    sem_post(&this->mutex); //Le post su sem_full e mutex sono invertite solo per rendere leggibili le stampe di debug!!!!
     return;
 }

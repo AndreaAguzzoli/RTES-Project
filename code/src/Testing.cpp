@@ -6,7 +6,7 @@
 #include"Queue.cpp" 
 
 using namespace std;
-Queue<int> q(RELIABILITY, 2, 8);
+Queue<int> q(RELIABILITY, 1, 8);
 
 void* pop_routine(void* p){
     int id = *((int *) p);
@@ -26,7 +26,7 @@ void* push_routine(void* p){
     //cout << "THREAD " << id << " PUSHER STARTS FOR " << times << " TIMES!" << endl;
     while(times){
         int push = rand() % 150;
-        int level = rand() % 2;
+        int level = rand() % q.getLevels();
         q.push(push, level);
         --times;
     }

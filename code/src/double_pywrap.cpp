@@ -1,4 +1,4 @@
-// int_pywrap.cpp
+// double_pywrap.cpp
 #include <pybind11/pybind11.h>
 #include "Queue.h"
 #include "Queue.cpp"
