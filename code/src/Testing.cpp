@@ -2,18 +2,27 @@
 #include<unistd.h>
 #include<string>
 #include<stdlib.h>
+
 #include"Queue.h"
 #include"Queue.cpp" 
 
 using namespace std;
-Queue<int> q(RELIABILITY, 1, 8);
+Queue<int> q(RELIABILITY, 3, 3);
+
+void mySleep(void)
+{
+  struct timespec t;
+  t.tv_sec = 0;
+  t.tv_nsec = (rand()%10+1)*1000000;
+  nanosleep(&t,NULL);
+}
 
 void* pop_routine(void* p){
     int id = *((int *) p);
-    int times = 23;
-    //cout << "THREAD " << id << " POPPER STARS FOR " << times << " TIMES!" << endl;
+    int times = 25;
     while(times){
         int pop = q.pop();
+        mySleep();
         --times;
     }
     cout << "POPPER DONE" << endl;
@@ -22,12 +31,12 @@ void* pop_routine(void* p){
 
 void* push_routine(void* p){
     int id = *((int *) p);
-    int times = 23;
-    //cout << "THREAD " << id << " PUSHER STARTS FOR " << times << " TIMES!" << endl;
+    int times = 25;
     while(times){
         int push = rand() % 150;
         int level = rand() % q.getLevels();
         q.push(push, level);
+        mySleep();
         --times;
     }
     cout << "PUSHER DONE" << endl;
@@ -42,7 +51,7 @@ int main(){
     threads = (pthread_t *) malloc(THREADS*sizeof(pthread_t));
     taskids = (int *)malloc(THREADS*sizeof(int));
 
-    srand(2387);
+    srand(65);
 
     for(int i=0; i<THREADS; ++i){
         taskids[i] = i;

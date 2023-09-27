@@ -1,7 +1,6 @@
 import Queue_cpp_double as qu
 import threading
 import random
-import array as arr
 
 q=qu.Queue(levels=2, dim=5)
 

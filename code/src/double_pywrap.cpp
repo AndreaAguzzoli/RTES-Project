@@ -23,5 +23,5 @@ PYBIND11_MODULE(Queue_cpp_double, m) {
         .def("isEmpty", &Queue<double>::isEmpty)
         .def("show", &Queue<double>::show)
         .def("pop", &Queue<double>::pop, py::call_guard<py::gil_scoped_release>()) //Rendo accessibile ovviamente la pop
-        .def("push", &Queue<double>::push, py::call_guard<py::gil_scoped_release>(), py::arg("element")=-1.0, py::arg("priority")=0); //Rendo accessibile ovviamente la push
+        .def("push", &Queue<double>::push, py::call_guard<py::gil_scoped_release>(), py::arg("element")=1.0, py::arg("priority")=0); //Rendo accessibile ovviamente la push
 }

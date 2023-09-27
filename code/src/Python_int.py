@@ -3,10 +3,10 @@ import threading
 import random
 import array as arr
 
-q=qu.Queue(levels=3, dim=6)
+q=qu.Queue(levels=2, dim=4)
 
 def popper(id):
-    times = 27
+    times = 30
     while times:
         p = q.pop()
         times = times - 1
@@ -14,7 +14,7 @@ def popper(id):
     print("POPPER DONE")
 
 def pusher(id):
-    times = 27
+    times = 30
     while times:
         push = random.randint(1,50)
         level = random.randint(0,q.getLevels()-1)
